@@ -1,0 +1,23 @@
+worker.list=loadbalancer,status
+
+worker.template.port=8009
+worker.template.type=ajp13
+worker.template.ping_mode=A
+worker.template.socket_timeout=0
+worker.template.socket_keepalive=False
+worker.template.connection_pool_size=200
+worker.template.connection_pool_minsize=0
+worker.template.connection_pool_timeout=60
+
+<% @tomcat_servers.each do |server| %>
+worker.<%= server['name'] %>.reference=worker.template
+worker.<%= server['name'] %>.host=<%= server['host'] %>
+worker.<%= server['name'] %>.route=<%= server['route'] %>
+worker.<%= server['name'] %>.lbfactor=<%= server['weight'] %>
+<% end %>
+
+worker.loadbalancer.type=lb
+worker.loadbalancer.balance_workers=<%= @tomcat_servers.map{|server| server['name'] }.join(',') %>
+worker.loadbalancer.sticky_session=<%= @sticky_session %>
+
+worker.status.type=status

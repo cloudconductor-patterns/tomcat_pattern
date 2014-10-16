@@ -1,0 +1,4 @@
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+<%- @pg_hba.each do |config| %>
+<%= config[:type].ljust(7) %>	<%= config[:db].ljust(15) %>	<%= config[:user].ljust(15) %>	<%= (config[:addr] || '').ljust(23) %>	<%= config[:method] %>
+<%- end %>

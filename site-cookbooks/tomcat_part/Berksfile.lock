@@ -1,0 +1,17 @@
+DEPENDENCIES
+  tomcat_part
+    path: .
+    metadata: true
+
+GRAPH
+  chef-sugar (2.2.0)
+  java (1.28.0)
+  openssl (2.0.0)
+    chef-sugar (>= 0.0.0)
+  tomcat (0.16.2)
+    java (>= 0.0.0)
+    openssl (>= 0.0.0)
+  tomcat_part (0.0.0)
+    tomcat (>= 0.0.0)
+    yum (>= 0.0.0)
+  yum (3.3.2)
