@@ -7,16 +7,16 @@ postgresql_connection_info = {
 
 applications = node['cloudconductor']['applications'].select { |_app_name, app| app['type'] == 'dynamic' }
 applications.each do |app_name, app|
-  next unless app['migration'] && app['migration']['enabled']
-  case app['migration']['type']
+  next unless app['parameters'] && app['parameters']['migration']
+  case app['parameters']['migration']['type']
   when 'sql'
-    if app['migration']['url']
+    if app['parameters']['migration']['url']
       remote_file "#{Chef::Config[:file_cache_path]}/#{app_name}.sql" do
-        source app['migration']['url']
+        source app['parameters']['migration']['url']
       end
     else
       file "#{Chef::Config[:file_cache_path]}/#{app_name}.sql" do
-        content app['migration']['query']
+        content app['parameters']['migration']['query']
       end
     end
 
