@@ -17,7 +17,7 @@ require 'yaml'
 require 'json'
 require 'active_support'
 require 'cloud_conductor_utils/consul'
-require_relative './logger'
+require_relative './pattern_logger'
 
 module CloudConductorPattern
   # rubocop: disable ClassLength
@@ -29,7 +29,7 @@ module CloudConductorPattern
       log_dir = File.join(@pattern_dir, 'logs')
       FileUtils.mkdir_p(log_dir) unless Dir.exist?(log_dir)
       log_filename = File.join(log_dir, 'event-handler.log')
-      @logger = CloudConductorPattern::Logger.logger(log_filename)
+      @logger = CloudConductorPattern::PatternLogger.logger(log_filename)
       @roles = node_role.split(',')
     end
 
@@ -102,6 +102,7 @@ module CloudConductorPattern
       cookbooks_dir = File.join(@pattern_dir, 'cookbooks')
       site_cookbooks_dir = File.join(@pattern_dir, 'site-cookbooks')
       File.open(chefsolo_config_file, 'w') do |file|
+        file.write("ssl_verify_mode :verify_peer\n")
         file.write("role_path '#{roles_dir}'\n")
         file.write("log_level :info\n")
         file.write("log_location '#{chefsolo_log_file}'\n")

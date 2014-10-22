@@ -12,16 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-require 'logger'
+require 'rspec/core/rake_task'
 
-module CloudConductorPattern
-  class Logger
-    def self.logger(log_filename)
-      logger = ::Logger.new(log_filename)
-      logger.formatter = proc do |severity, datetime, _progname, message|
-        "[#{datetime.strftime('%Y-%m-%dT%H:%M:%S')}] #{severity}: #{message}\n"
-      end
-      logger
-    end
-  end
-end
+RSpec::Core::RakeTask.new(:spec)
