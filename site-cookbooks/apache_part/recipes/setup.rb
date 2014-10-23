@@ -14,10 +14,14 @@ bash 'install_mod_jk' do
   code <<-EOS
     tar -zxvf #{file_path}
     cd tomcat-connectors-#{mod_jk_version}-src/native
+    if [ -z "$PKG_CONFIG_PATH" ]; then
+      export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/lib64/pkgconfig
+    fi
     ./configure --with-apxs=/usr/sbin/apxs
     make
     make install
   EOS
+  cwd Chef::Config[:file_cache_path]
   not_if { File.exist?("#{node['apache']['libexec_dir']}/mod_jk.so") }
 end
 
