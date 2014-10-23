@@ -22,7 +22,7 @@ applications.each do |app_name, app|
 
     postgresql_database app_name do
       connection postgresql_connection_info
-      sql ::File.read("#{Chef::Config[:file_cache_path]}/#{app_name}.sql")
+      sql lazy { ::File.read("#{Chef::Config[:file_cache_path]}/#{app_name}.sql") }
       action :query
     end
   end
