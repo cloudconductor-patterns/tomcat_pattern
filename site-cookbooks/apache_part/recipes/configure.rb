@@ -1,5 +1,6 @@
 # set workers.properties
-tomcat_servers = node['cloudconductor']['servers'].map do |hostname, server|
+tomcat_servers = node['cloudconductor']['servers'].select { |_, s| s['roles'].include?('ap') }
+tomcat_servers = tomcat_servers.map do |hostname, server|
   {
     'name' => hostname,
     'host' => server['private_ip'],
