@@ -1,8 +1,8 @@
 postgresql_connection_info = {
   host: '127.0.0.1',
   port: node['postgresql']['config']['port'],
-  username: 'postgres',
-  password: node['postgresql']['password']['postgres']
+  username: node['postgresql_part']['application']['user'],
+  password: node['postgresql_part']['application']['password']
 }
 
 applications = node['cloudconductor']['applications'].select { |_app_name, app| app['type'] == 'dynamic' }
