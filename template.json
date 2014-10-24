@@ -220,10 +220,10 @@
     "APSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
-        "GroupDescription" : "Enable SSH access and HTTP access via port 8080",
+        "GroupDescription" : "Enable AJP access via port 8009",
         "VpcId" : { "Ref" : "VPC" },
         "SecurityGroupIngress" : [
-          {"IpProtocol" : "tcp", "FromPort" : "8080", "ToPort" : "8080", "SourceSecurityGroupId" : {"Ref": "WebSecurityGroup"}}
+          {"IpProtocol" : "tcp", "FromPort" : "8009", "ToPort" : "8009", "SourceSecurityGroupId" : {"Ref": "WebSecurityGroup"}}
         ]
       }
     },
@@ -265,10 +265,10 @@
     "DBSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
-        "GroupDescription" : "Enable SSH access and DB access via port 3306",
+        "GroupDescription" : "Enable DB access via port 5432",
         "VpcId" : { "Ref" : "VPC" },
         "SecurityGroupIngress" : [
-          {"IpProtocol" : "tcp", "FromPort" : "3306", "ToPort" : "3306", "SourceSecurityGroupId" : {"Ref": "APSecurityGroup"}}
+          {"IpProtocol" : "tcp", "FromPort" : "5432", "ToPort" : "5432", "SourceSecurityGroupId" : {"Ref": "APSecurityGroup"}}
         ]
       }
     },
