@@ -6,7 +6,7 @@ template "#{node['apache']['conf_dir']}/uriworkermap.properties" do
   variables(
     app_name: node['cloudconductor']['applications'].first.first
   )
-  notifies :reload, 'service[apache2]', :dalayed
+  notifies :reload, 'service[apache2]', :delayed
 end
 
 service 'apache2' do
