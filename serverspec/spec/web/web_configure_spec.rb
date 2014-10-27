@@ -10,3 +10,21 @@ end
 describe port(80) do
   it { should be_listening.with('tcp') }
 end
+
+# Check connect ap servers
+describe 'connect ap_servers' do
+  ap_servers = property[:servers].each_value.select do |server|
+    server[:roles].include?('ap')
+  end
+
+  ap_servers.each do |server|
+    describe command("curl --noproxy #{server[:private_ip]} 'http://#{server[:private_ip]}:8009'") do
+      it { should return_exit_status 0 }
+    end
+
+    describe command("hping3 -S #{server[:private_ip]} -p 8009 -c 5") do
+      its(:stdout) { should match '/sport=8009 flags=SA/' }
+    end
+  end
+end
+
