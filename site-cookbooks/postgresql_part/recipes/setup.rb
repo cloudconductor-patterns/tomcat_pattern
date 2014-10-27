@@ -14,13 +14,6 @@ postgresql_connection_info = {
   password: node['postgresql']['password']['postgres']
 }
 
-postgresql_database_user node['postgresql_part']['backup']['user'] do
-  connection postgresql_connection_info
-  password node['postgresql_part']['backup']['password']
-  privileges [:all]
-  action :create
-end
-
 postgresql_database_user node['postgresql_part']['application']['user'] do
   connection postgresql_connection_info
   password node['postgresql_part']['application']['password']

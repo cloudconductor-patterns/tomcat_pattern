@@ -8,8 +8,6 @@ default['postgresql']['server']['service_name'] = "postgresql-#{node['postgresql
 default['postgresql']['password']['postgres'] = 'todo_replace_random_password'
 default['postgresql']['config']['listen_addresses'] = '*'
 
-default['postgresql_part']['backup']['user'] = 'backup'
-default['postgresql_part']['backup']['password'] = 'todo_replace_random_password'
 default['postgresql_part']['application']['database'] = 'application'
 default['postgresql_part']['application']['user'] = 'application'
 default['postgresql_part']['application']['password'] = 'todo_replace_random_password'

@@ -21,8 +21,10 @@ template "#{node['postgresql']['dir']}/pg_hba.conf" do
   variables(
     pg_hba: node['postgresql']['pg_hba']
   )
+  notifies :reload, node['postgresql']['server']['service_name'], :delayed
 end
 
-service "postgresql-#{node['postgresql']['version']}" do
-  action :reload
+service node['postgresql']['server']['service_name'] do
+  supports [:restart, :reload, :status]
+  action :nothing
 end
