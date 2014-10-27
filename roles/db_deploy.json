@@ -1,6 +1,6 @@
 {
   "name": "db_deploy",
-  "description": "Execute SQL query",
+  "description": "Executes SQL query",
   "chef_type": "role",
   "json_class": "Chef::Role",
   "run_list": [

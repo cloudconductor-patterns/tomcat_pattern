@@ -1,6 +1,6 @@
 {
   "name": "db_configure",
-  "description": "Configure PostgreSQL and backup",
+  "description": "Configures PostgreSQL and backup",
   "chef_type": "role",
   "json_class": "Chef::Role",
   "default_attributes": {

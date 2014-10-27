@@ -1,6 +1,6 @@
 name             'backup_restore'
 version          '0.0.1'
-description      'Install/Configure backups and run restore'
+description      'Installs/Configures backups and run restore'
 license          'Apache v2.0'
 maintainer       'TIS Inc.'
 maintainer_email 'ccndctr@gmail.com'

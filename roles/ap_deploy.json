@@ -1,6 +1,6 @@
 {
   "name": "ap_deploy",
-  "description": "Deploy Java application",
+  "description": "Deploys Java application",
   "chef_type": "role",
   "json_class": "Chef::Role",
   "run_list": [

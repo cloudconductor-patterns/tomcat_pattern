@@ -1,6 +1,6 @@
 {
   "name": "web_deploy",
-  "description": "Configure mod_jk workers.properties",
+  "description": "Configures mod_jk workers.properties",
   "chef_type": "role",
   "json_class": "Chef::Role",
   "run_list": [
