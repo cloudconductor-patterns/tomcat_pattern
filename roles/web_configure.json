@@ -1,6 +1,6 @@
 {
   "name": "web_configure",
-  "description": "Configure mod_jk settings",
+  "description": "Configures mod_jk settings",
   "chef_type": "role",
   "json_class": "Chef::Role",
   "run_list": [

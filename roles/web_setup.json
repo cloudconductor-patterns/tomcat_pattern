@@ -1,6 +1,6 @@
 {
   "name": "web_setup",
-  "description": "Install Apache HTTP Server",
+  "description": "Installs Apache HTTP Server",
   "chef_type": "role",
   "json_class": "Chef::Role",
   "run_list": [
