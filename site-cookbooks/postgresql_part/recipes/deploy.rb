@@ -24,6 +24,12 @@ applications.each do |app_name, app|
       connection postgresql_connection_info
       sql lazy { ::File.read("#{Chef::Config[:file_cache_path]}/#{app_name}.sql") }
       action :query
+      not_if do
+        cmd = ["sudo -u postgres /usr/bin/psql -d #{node['postgresql_part']['application']['database']}",
+               "-qtA -c \"select count(*) from information_schema.tables where table_schema = 'public';\"",
+               '2>&1'].join(' ')
+        `#{cmd}`.to_i > 0
+      end
     end
   end
 end

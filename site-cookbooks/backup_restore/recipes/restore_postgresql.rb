@@ -15,7 +15,7 @@ end
 
 # TODO: Create LWRP
 bash 'extract_full_backup' do
-  flags "-e"
+  flags '-e'
   code <<-EOF
     tar -xvf #{backup_file} -C #{tmp_dir}
     gunzip #{tmp_dir}/#{backup_name}/databases/PostgreSQL.sql.gz
@@ -28,7 +28,7 @@ service "postgresql-#{source['version']}" do
   action :start
 end
 
-bash "execute_restore_query" do
+bash 'execute_restore_query' do
   code "/usr/bin/psql -f #{tmp_dir}/#{backup_name}/databases/PostgreSQL.sql"
   user 'postgres'
   only_if { ::File.exist?("#{tmp_dir}/#{backup_name}/databases/PostgreSQL.sql") }
