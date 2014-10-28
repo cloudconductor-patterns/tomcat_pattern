@@ -5,7 +5,11 @@ tmp_dir = "#{node['backup_restore']['tmp_dir']}/restore"
 
 node['backup_restore']['restore']['target_sources'].each do |source_type|
   # Find latest backup on S3
-  backup_name = "#{source_type}_full"
+  if %w(mysql ruby).include?(source_type)
+    backup_name = "#{source_type}_full"
+  else
+    backup_name = source_type
+  end
   s3_path = URI.join("s3://#{s3['bucket']}", File.join(s3['prefix'], backup_name, '/')).to_s
   datetime_regexp = '[0-9]\{4\}.[0-9]\{2\}.[0-9]\{2\}.[0-9]\{2\}.[0-9]\{2\}.[0-9]\{2\}/$'
   cmd = "/usr/bin/s3cmd ls #{s3_path} | grep '#{datetime_regexp}' | sort | awk 'END{print $2}'"

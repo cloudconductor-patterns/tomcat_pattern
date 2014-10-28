@@ -13,6 +13,7 @@ backup_model :postgresql do
       db.port = "#{source['port']}"
       db.username = "#{source['user']}"
       db.password = "#{source['password']}"
+      db.additional_options = ["--clean"]
     end
 
     compress_with Gzip
