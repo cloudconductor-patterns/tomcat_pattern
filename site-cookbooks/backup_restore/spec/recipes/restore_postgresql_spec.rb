@@ -2,7 +2,7 @@ require_relative '../spec_helper'
 
 describe 'backup_restore::restore_postgresql' do
   let(:chef_run) do
-    runner = ChefSpec::Runner.new(
+    ChefSpec::Runner.new(
       cookbook_path: %w(site-cookbooks cookbooks),
       platform:      'centos',
       version:       '6.5'

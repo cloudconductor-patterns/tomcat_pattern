@@ -13,7 +13,6 @@ describe 'backup_restore::backup' do
     runner.converge(described_recipe)
   end
 
-
   it 'run backup' do
     log_dir = '/var/log/backup'
     user = 'root'

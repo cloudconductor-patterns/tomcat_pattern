@@ -15,8 +15,8 @@ describe 'backup_restore::setup' do
       platform:      'centos',
       version:       '6.5'
     ) do |node|
-      node.set['backup']['version'] = '4.1.0' #=> Default nil => 4.0.2
-      node.set['backup']['upgrade?'] = true   #=> Default false
+      node.set['backup']['version'] = '4.1.0' # => Default nil => 4.0.2
+      node.set['backup']['upgrade?'] = true   # => Default false
     end
     runner.converge(described_recipe)
   end
@@ -49,7 +49,7 @@ describe 'backup_restore::setup' do
 
   it 'create a link to backup bin' do
     IO::File.stub(:exist?).and_call_original
-    IO::File.stub(:exist?).with("/root/.chefdk/gem/ruby/2.1.0/bin/backup").and_return(true)
+    IO::File.stub(:exist?).with('/root/.chefdk/gem/ruby/2.1.0/bin/backup').and_return(true)
     link = chef_run.link('/usr/local/bin/backup')
     expect(link).to link_to('/root/.chefdk/gem/ruby/2.1.0/bin/backup')
   end
