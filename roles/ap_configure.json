@@ -1,6 +1,6 @@
 {
   "name": "ap_configure",
-  "description": "Configure Tomcat",
+  "description": "Configures Tomcat",
   "chef_type": "role",
   "json_class": "Chef::Role",
   "run_list": [

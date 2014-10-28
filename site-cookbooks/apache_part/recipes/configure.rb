@@ -1,5 +1,6 @@
 # set workers.properties
-tomcat_servers = node['cloudconductor']['servers'].map do |hostname, server|
+tomcat_servers = node['cloudconductor']['servers'].select { |_, s| s['roles'].include?('ap') }
+tomcat_servers = tomcat_servers.map do |hostname, server|
   {
     'name' => hostname,
     'host' => server['private_ip'],
@@ -17,8 +18,12 @@ template "#{node['apache']['conf_dir']}/workers.properties" do
     tomcat_servers: tomcat_servers,
     sticky_session: node['apache_part']['sticky_session']
   )
+  notifies :reload, 'service[apache2]', :delayed
 end
 
-service 'httpd' do
-  action :reload
+service 'apache2' do
+  service_name node['apache']['package']
+  reload_command '/sbin/service httpd graceful'
+  supports [:start, :restart, :reload, :status]
+  action :nothing
 end
