@@ -19,18 +19,6 @@ describe 'postgresql server' do
     root_passwd = 'todo_replace_random_password' 
   end
 
-  if params['postgresql_part'] && params['postgresql_part']['backup'] && params['postgresql_part']['backup']['user']
-    backup_user = params['postgresql_part']['backup']['user']
-  else
-    backup_user = 'postgres'
-  end
-
-  if params['postgresql_part'] && params['postgresql_part']['backup'] && params['postgresql_part']['backup']['password']
-    backup_passwd = params['postgresql_part']['backup']['password']
-  else
-    backup_passwd = 'todo_replace_random_password' 
-  end
-
   if params['postgresql_part'] && params['postgresql_part']['application'] && params['postgresql_part']['application']['database']
     app_db = params['postgresql_part']['application']['database']
   else
@@ -52,7 +40,6 @@ describe 'postgresql server' do
   before(:all) do
     backend.run_command(<<-EOS
       echo #{hostname}:#{port}:#{database}:#{root_user}:#{root_passwd} > ~/.pgpass
-      echo #{hostname}:#{port}:#{database}:#{backup_user}:#{backup_passwd} >> ~/.pgpass
       echo #{hostname}:#{port}:#{app_db}:#{app_user}:#{app_passwd} >> ~/.pgpass
       chmod 600 ~/.pgpass
       EOS
@@ -60,10 +47,6 @@ describe 'postgresql server' do
   end
 
   describe command("psql -U #{root_user} -d #{database} -h #{hostname} -p #{port} -c '\\l'") do
-    its(:exit_status) {should eq 0 }
-  end
-
-  describe command("psql -U #{backup_user} -d #{database} -h #{hostname} -p #{port} -c '\\l'") do
     its(:exit_status) {should eq 0 }
   end
 
