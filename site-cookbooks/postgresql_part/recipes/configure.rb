@@ -4,7 +4,7 @@ pg_hba = [
   { type: 'local', db: 'all', user: 'all', addr: nil, method: 'ident' },
   { type: 'host', db: 'all', user: 'postgres', addr: '127.0.0.1/32', method: 'md5' },
   { type: 'host', db: 'all', user: 'postgres', addr: '::1/128', method: 'md5' },
-  { type: 'host', db: 'all', user: 'postgres', addr: '0.0.0.0/0', method: 'reject' },
+  { type: 'host', db: 'all', user: 'postgres', addr: '0.0.0.0/0', method: 'reject' }
 ]
 ap_servers = node['cloudconductor']['servers'].select { |_name, server| server['roles'].include?('ap') }
 pg_hba += ap_servers.map do |_name, server|
@@ -20,10 +20,11 @@ template "#{node['postgresql']['dir']}/pg_hba.conf" do
   variables(
     pg_hba: node['postgresql']['pg_hba']
   )
-  notifies :reload, node['postgresql']['server']['service_name'], :delayed
+  notifies :reload, 'service[postgresql]', :delayed
 end
 
-service node['postgresql']['server']['service_name'] do
+service 'postgresql' do
+  service_name node['postgresql']['server']['service_name']
   supports [:restart, :reload, :status]
   action :nothing
 end
