@@ -4,7 +4,7 @@ require 'chefspec'
 describe 'postgresql_part::default' do
   let(:chef_run) do
     ChefSpec::SoloRunner.new(
-      cookbook_path: ['cookbooks', 'site-cookbooks'],
+      cookbook_path: %w(cookbooks site-cookbooks),
       platform: 'centos',
       version: '6.5'
     ).converge(described_recipe)
@@ -14,4 +14,3 @@ describe 'postgresql_part::default' do
     expect(chef_run).to include_recipe 'postgresql_part::setup'
   end
 end
-

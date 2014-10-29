@@ -4,7 +4,7 @@ require 'chefspec'
 describe 'postgresql_part::default' do
   let(:chef_run) do
     runner = ChefSpec::SoloRunner.new(
-      cookbook_path: ['cookbooks', 'site-cookbooks'],
+      cookbook_path: %w(cookbooks site-cookbooks),
       platform: 'centos',
       version: '6.5'
     ) do |node|
@@ -51,4 +51,3 @@ describe 'postgresql_part::default' do
     )
   end
 end
-

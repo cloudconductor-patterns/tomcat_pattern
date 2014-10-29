@@ -4,7 +4,7 @@ require 'chefspec'
 describe 'postgresql_part::configure' do
   let(:chef_run) do
     ChefSpec::SoloRunner.new(
-      cookbook_path: ['cookbooks', 'site-cookbooks'],
+      cookbook_path: %w(cookbooks site-cookbooks),
       platform: 'centos',
       version: '6.5'
     ) do |node|
@@ -26,12 +26,12 @@ describe 'postgresql_part::configure' do
       group: 'postgres',
       variables: {
         pg_hba: [
-          { "type" => 'local', "db" => 'all', "user" => 'postgres', "addr" => nil, "method" => 'ident' },
-          { "type" => 'local', "db" => 'all', "user" => 'all', "addr" => nil, "method" => 'ident' },
-          { "type" => 'host', "db" => 'all', "user" => 'all', "addr" => '127.0.0.1/32', "method" => 'md5' },
-          { "type" => 'host', "db" => 'all', "user" => 'all', "addr" => '::1/128', "method" => 'md5' },
-          { "type" => 'host', "db" => 'all', "user" => 'postgres', "addr" => '0.0.0.0/0', "method" => 'reject' },
-          { "type" => 'host', "db" => 'all', "user" => 'all', "addr" => '172.0.0.1/32', "method" => 'md5'}
+          { 'type' => 'local', 'db' => 'all', 'user' => 'postgres', 'addr' => nil, 'method' => 'ident' },
+          { 'type' => 'local', 'db' => 'all', 'user' => 'all', 'addr' => nil, 'method' => 'ident' },
+          { 'type' => 'host', 'db' => 'all', 'user' => 'all', 'addr' => '127.0.0.1/32', 'method' => 'md5' },
+          { 'type' => 'host', 'db' => 'all', 'user' => 'all', 'addr' => '::1/128', 'method' => 'md5' },
+          { 'type' => 'host', 'db' => 'all', 'user' => 'postgres', 'addr' => '0.0.0.0/0', 'method' => 'reject' },
+          { 'type' => 'host', 'db' => 'all', 'user' => 'all', 'addr' => '172.0.0.1/32', 'method' => 'md5' }
         ]
       }
     )
@@ -42,4 +42,3 @@ describe 'postgresql_part::configure' do
     expect(template).to notify('service[postgresql]').to(:reload).delayed
   end
 end
-

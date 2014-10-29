@@ -4,7 +4,7 @@ require 'chefspec'
 describe 'postgresql_part::deploy' do
   let(:chef_run_url) do
     ChefSpec::SoloRunner.new(
-      cookbook_path: ['cookbooks', 'site-cookbooks'],
+      cookbook_path: %w(cookbooks site-cookbooks),
       platform: 'centos',
       version: '6.5'
     ) do |node|
@@ -23,7 +23,7 @@ describe 'postgresql_part::deploy' do
   end
   let(:chef_run_query) do
     ChefSpec::SoloRunner.new(
-      cookbook_path: ['cookbooks', 'site-cookbooks'],
+      cookbook_path: %w(cookbooks site-cookbooks),
       platform: 'centos',
       version: '6.5'
     ) do |node|
@@ -69,4 +69,3 @@ describe 'postgresql_part::deploy' do
   end
 
 end
-
