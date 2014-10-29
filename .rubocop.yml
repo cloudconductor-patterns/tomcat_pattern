@@ -2,6 +2,7 @@ AllCops:
   Exclude:
     - cookbooks/**/*
     - site-cookbooks/**/metadata.rb
+    - vendor/**/*
 
 LineLength:
   Max: 130
