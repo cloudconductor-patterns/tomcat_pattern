@@ -21,13 +21,19 @@ describe 'backup_restore::restore' do
     runner.converge(described_recipe)
   end
 
+  before do
+    Chef::Recipe.any_instance.stub(:`).with(%r(/usr/bin/s3cmd ls))
+      .and_return('s3://s3bucket/backup/directory_full/2014.10.01.00.00.00')
+    Chef::Recipe.any_instance.stub(:`).with('psql --version').and_return('psql (PostgreSQL) 9.3.5')
+  end
+
   it 'create temporary directory' do
     expect(chef_run).to create_directory('/tmp/backup/restore').with(
       recursive: true
     )
   end
 
-  it 'run directory backup' do
+  it 'fetch s3' do
     expect(chef_run).to include_recipe('backup_restore::fetch_s3')
   end
 
