@@ -2,7 +2,7 @@ require_relative '../spec_helper'
 
 describe 'backup_restore::setup' do
   let(:chef_run) do
-    ChefSpec::Runner.new(
+    ChefSpec::SoloRunner.new(
       cookbook_path: %w(site-cookbooks cookbooks),
       platform:      'centos',
       version:       '6.5'
@@ -10,7 +10,7 @@ describe 'backup_restore::setup' do
   end
 
   let(:chef_run_backup_options) do
-    runner =  ChefSpec::Runner.new(
+    runner =  ChefSpec::SoloRunner.new(
       cookbook_path: %w(site-cookbooks cookbooks),
       platform:      'centos',
       version:       '6.5'
@@ -48,8 +48,10 @@ describe 'backup_restore::setup' do
   end
 
   it 'create a link to backup bin' do
-    IO::File.stub(:exist?).and_call_original
-    IO::File.stub(:exist?).with('/root/.chefdk/gem/ruby/2.1.0/bin/backup').and_return(true)
+    #IO::File.stub(:exist?).and_call_original
+    #IO::File.stub(:exist?).with('/root/.chefdk/gem/ruby/2.1.0/bin/backup').and_return(true)
+    allow(File).to receive(:exist?).and_call_original
+    allow(File).to receive(:exist?).with('/root/.chefdk/gem/ruby/2.1.0/bin/backup').and_return(true)
     link = chef_run.link('/usr/local/bin/backup')
     expect(link).to link_to('/root/.chefdk/gem/ruby/2.1.0/bin/backup')
   end

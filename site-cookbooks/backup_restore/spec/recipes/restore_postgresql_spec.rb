@@ -2,7 +2,7 @@ require_relative '../spec_helper'
 
 describe 'backup_restore::restore_postgresql' do
   let(:chef_run) do
-    ChefSpec::Runner.new(
+    ChefSpec::SoloRunner.new(
       cookbook_path: %w(site-cookbooks cookbooks),
       platform:      'centos',
       version:       '6.5'
@@ -19,8 +19,8 @@ describe 'backup_restore::restore_postgresql' do
   backup_file = "#{tmp_dir}/#{backup_name}.tar"
 
   it 'extract_full_backup' do
-    allow(IO::File).to receive(:exist?).and_call_original
-    allow(IO::File).to receive(:exist?).with(backup_file).and_return(true)
+    allow(File).to receive(:exist?).and_call_original
+    allow(File).to receive(:exist?).with(backup_file).and_return(true)
     allow(Dir).to receive(:exist?).and_call_original
     allow(Dir).to receive(:exist?).with("#{tmp_dir}/#{backup_name}").and_return(false)
     expect(chef_run).to run_bash('extract_full_backup').with(
