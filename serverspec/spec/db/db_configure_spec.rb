@@ -16,7 +16,7 @@ describe 'postgresql server' do
   if params[:postgresql] && params[:postgresql]['password'] && params[:postgresql]['password']['postgres']
     root_passwd = params[:postgresql]['password']['postgres']
   else
-    root_passwd = 'todo_replace_random_password' 
+    root_passwd = 'todo_replace_random_password'
   end
 
   if params['postgresql_part'] && params['postgresql_part']['application'] && params['postgresql_part']['application']['database']
@@ -34,7 +34,7 @@ describe 'postgresql server' do
   if params['postgresql_part'] && params['postgresql_part']['application'] && params['postgresql_part']['application']['password']
     app_passwd = params['postgresql_part']['application']['password']
   else
-    app_passwd = 'todo_replace_random_password' 
+    app_passwd = 'todo_replace_random_password'
   end
 
   before(:all) do
@@ -47,11 +47,11 @@ describe 'postgresql server' do
   end
 
   describe command("psql -U #{root_user} -d #{database} -h #{hostname} -p #{port} -c '\\l'") do
-    its(:exit_status) {should eq 0 }
+    its(:exit_status) { should eq 0 }
   end
 
   describe command("psql -U #{app_user} -d #{app_db} -h #{hostname} -p #{port} -c '\\l'") do
-    its(:exit_status) {should eq 0 }
+    its(:exit_status) { should eq 0 }
   end
 
   after(:all) do
