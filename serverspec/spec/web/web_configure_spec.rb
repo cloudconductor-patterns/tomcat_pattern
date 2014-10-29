@@ -19,8 +19,7 @@ describe 'connect ap_servers' do
 
   ap_servers.each do |server|
     describe command("hping3 -S #{server[:private_ip]} -p 8009 -c 5") do
-      its(:stdout) { should match /sport=8009 flags=SA/ }
+      its(:stdout) { should match(/sport=8009 flags=SA/) }
     end
   end
 end
-
