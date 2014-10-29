@@ -3,7 +3,7 @@ require 'chefspec'
 
 describe 'postgresql_part::deploy' do
   let(:chef_run_url) do
-    ChefSpec::Runner.new(
+    ChefSpec::SoloRunner.new(
       cookbook_path: ['cookbooks', 'site-cookbooks'],
       platform: 'centos',
       version: '6.5'
@@ -22,7 +22,7 @@ describe 'postgresql_part::deploy' do
     end.converge(described_recipe)
   end
   let(:chef_run_query) do
-    ChefSpec::Runner.new(
+    ChefSpec::SoloRunner.new(
       cookbook_path: ['cookbooks', 'site-cookbooks'],
       platform: 'centos',
       version: '6.5'
