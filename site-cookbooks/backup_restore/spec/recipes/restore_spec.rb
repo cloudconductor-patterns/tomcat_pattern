@@ -21,11 +21,6 @@ describe 'backup_restore::restore' do
     runner.converge(described_recipe)
   end
 
-  before do
-    stub_command('/usr/bin/s3cmd').and_return(true)
-    expect_any_instance_of(Chef::Recipe).to receive(:`).and_return('s3://s3bucket/backup/directory_full/2014.10.01.00.00.00')
-  end
-
   it 'create temporary directory' do
     expect(chef_run).to create_directory('/tmp/backup/restore').with(
       recursive: true
