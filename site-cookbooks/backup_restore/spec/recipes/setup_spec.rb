@@ -48,8 +48,6 @@ describe 'backup_restore::setup' do
   end
 
   it 'create a link to backup bin' do
-    #IO::File.stub(:exist?).and_call_original
-    #IO::File.stub(:exist?).with('/root/.chefdk/gem/ruby/2.1.0/bin/backup').and_return(true)
     allow(File).to receive(:exist?).and_call_original
     allow(File).to receive(:exist?).with('/root/.chefdk/gem/ruby/2.1.0/bin/backup').and_return(true)
     link = chef_run.link('/usr/local/bin/backup')

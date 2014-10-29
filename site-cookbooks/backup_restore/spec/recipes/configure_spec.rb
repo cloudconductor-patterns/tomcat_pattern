@@ -36,9 +36,9 @@ describe 'backup_restore::configure' do
       group: 'root',
       install_s3cmd: false,
       config: {
-        "proxy_host" => 'localhost',
-        "proxy_port" => '8080',
-        "use_https" => false
+        'proxy_host' => 'localhost',
+        'proxy_port' => '8080',
+        'use_https' => false
       }
     )
   end
