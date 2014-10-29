@@ -18,8 +18,8 @@ describe 'apache_part::setup' do
 
   before do
     stub_command('/usr/sbin/httpd -t').and_return(0)
-    File.stub(:exists?).and_call_original
-    File.stub(:exists?).with('/usr/lib64/httpd/modules/mod_jk.so').and_return('true')
+    allow(File).to receive(:exists?).and_call_original
+    allow(File).to receive(:exists?).with('/usr/lib64/httpd/modules/mod_jk.so').and_return('true')
   end
 
   it 'install apache2' do
