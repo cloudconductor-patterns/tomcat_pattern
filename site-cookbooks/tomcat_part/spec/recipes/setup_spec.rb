@@ -3,7 +3,7 @@ require_relative '../spec_helper'
 describe 'tomcat_part::setup' do
   let(:chef_postgresql_run) do
     ChefSpec::SoloRunner.new(
-      cookbook_path: ['cookbooks', 'site-cookbooks'],
+      cookbook_path: %w(cookbooks site-cookbooks),
       platform: 'centos',
       version: '6.5'
     ) do |node|
@@ -16,12 +16,13 @@ describe 'tomcat_part::setup' do
   end
   let(:chef_mysql_run) do
     ChefSpec::SoloRunner.new(
-      cookbook_path: ['cookbooks', 'site-cookbooks'],
+      cookbook_path: %w(cookbooks site-cookbooks),
       platform: 'centos',
       version: '6.5'
     ) do |node|
       node.set['tomcat_part']['database']['type'] = 'mysql'
-      node.set['tomcat_part']['jdbc']['mysql'] = 'http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.33.tar.gz'
+      node.set['tomcat_part']['jdbc']['mysql'] = \
+        'http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.33.tar.gz'
       node.set['tomcat']['home'] = '/usr/share/tomcat7'
       node.set['tomcat']['user'] = 'tomcat'
       node.set['tomcat']['group'] = 'tomcat'

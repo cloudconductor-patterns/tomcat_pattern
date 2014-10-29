@@ -3,7 +3,7 @@ require_relative '../spec_helper'
 describe 'tomcat_part::deploy' do
   let(:chef_git_run) do
     ChefSpec::SoloRunner.new(
-      cookbook_path: ['cookbooks', 'site-cookbooks'],
+      cookbook_path: %w(cookbooks site-cookbooks),
       platform: 'centos',
       version: '6.5'
     ) do |node|
@@ -36,7 +36,7 @@ describe 'tomcat_part::deploy' do
   end
   let(:chef_http_run) do
     ChefSpec::SoloRunner.new(
-      cookbook_path: ['cookbooks', 'site-cookbooks'],
+      cookbook_path: %w(cookbooks site-cookbooks),
       platform: 'centos',
       version: '6.5'
     ) do |node|
