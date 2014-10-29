@@ -3,7 +3,7 @@ require_relative '../spec_helper'
 describe 'apache_part::configure' do
   let(:chef_run) do
     ChefSpec::SoloRunner.new(
-      cookbook_path: ['cookbooks', 'site-cookbooks'],
+      cookbook_path: %w(cookbooks site-cookbook),
       platform: 'centos',
       version: '6.5'
     ) do |node|
