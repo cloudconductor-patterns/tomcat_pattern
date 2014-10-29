@@ -10,11 +10,6 @@ describe 'backup_restore::restore_postgresql' do
   end
 
   tmp_dir = '/tmp/backup/restore'
-  source = {
-    port: 5432,
-    user: 'postgres',
-    password: ''
-  }
   backup_name = 'postgresql'
   backup_file = "#{tmp_dir}/#{backup_name}.tar"
 
@@ -61,19 +56,12 @@ describe 'backup_restore::restore_postgresql' do
     expect(chef_run).to start_service('postgresql-9.3')
   end
 
-  postgresql_connection_info = {
-    host: '127.0.0.1',
-    port: source[:port] || 5432,
-    username: source[:user],
-    password: source[:password]
-  }
-
   it 'run query for postgresql ' do
     allow(File).to receive(:exist?).and_call_original
     allow(File).to receive(:exist?).with("#{tmp_dir}/#{backup_name}/databases/PostgreSQL.sql").and_return(true)
     expect(chef_run).to run_bash('execute_restore_query').with(
       code: "/usr/bin/psql -f #{tmp_dir}/#{backup_name}/databases/PostgreSQL.sql",
-      user: 'postgres',
+      user: 'postgres'
     )
   end
 end
