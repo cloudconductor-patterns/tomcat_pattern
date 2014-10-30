@@ -3,15 +3,11 @@ require 'chefspec'
 
 describe 'postgresql_part::default' do
   let(:chef_run) do
-    runner = ChefSpec::SoloRunner.new(
+    ChefSpec::SoloRunner.new(
       cookbook_path: %w(cookbooks site-cookbooks),
       platform: 'centos',
       version: '6.5'
-    ) do |node|
-#      node.set['postgresql']['dir'] = '9.3'
-#      node.set['postgresql']['dir'] = "/var/lib/pgsql/#{node['postgresql']['version']}/data"
-    end
-    runner.converge(described_recipe)
+    ).converge(described_recipe)
   end
 
   it 'include postgresql::server' do
