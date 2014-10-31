@@ -36,19 +36,19 @@
       "Default" : "t2.small"
     },
     "webImageId" : {
-      "Description" : "WebServer Image Id. This parameter is automatically filled by CloudConductor.",
+      "Description" : "[computed] WebServer Image Id. This parameter is automatically filled by CloudConductor.",
       "Type" : "String"
     },
     "apImageId" : {
-      "Description" : "APServer Image Id. This parameter is automatically filled by CloudConductor.",
+      "Description" : "[computed] APServer Image Id. This parameter is automatically filled by CloudConductor.",
       "Type" : "String"
     },
     "dbImageId" : {
-      "Description" : "DBServer Image Id. This parameter is automatically filled by CloudConductor.",
+      "Description" : "[computed] DBServer Image Id. This parameter is automatically filled by CloudConductor.",
       "Type" : "String"
     },
     "CloudConductorLocation" : {
-      "Description" : "The IP address range of CloudConductor server to enable serf rpc access to frontend instance. This parameter is automatically filled by CloudConductor.",
+      "Description" : "The IP address range of CloudConductor server to enable serf rpc access to frontend instance.",
       "Type" : "String",
       "MinLength": "9",
       "MaxLength": "18",
