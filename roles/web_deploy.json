@@ -1,0 +1,9 @@
+{
+  "name": "web_deploy",
+  "description": "Configures mod_jk workers.properties",
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "run_list": [
+    "apache_part::deploy"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "web_setup",
+  "description": "Installs Apache HTTP Server",
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "run_list": [
+    "apache_part::setup"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "web_configure",
+  "description": "Configures mod_jk settings",
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "run_list": [
+    "apache_part::configure"
+  ]
+}

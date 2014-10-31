@@ -1,0 +1,5 @@
+<Context>
+  <Resource name="<%= @datasource %>" auth="Container" type="javax.sql.DataSource"
+    driverClassName="org.<%= @database['type'] %>.Driver" url="jdbc:<%= @database['type'] %>://<%= @database['host'] %>:<%= @database['port'] %>/<%= @database['name'] %>"
+    username="<%= @database['user'] %>" password="<%= @database['password'] %>" maxActive="100" maxIdle="30" maxWait="-1" />
+</Context>

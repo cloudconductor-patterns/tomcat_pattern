@@ -1,0 +1,9 @@
+{
+  "name": "ap_setup",
+  "description": "Installs Tomcat",
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "run_list": [
+    "tomcat_part::setup"
+  ]
+}

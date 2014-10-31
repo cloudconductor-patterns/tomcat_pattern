@@ -1,0 +1,34 @@
+LoadModule jk_module modules/mod_jk.so
+<IfModule mod_jk.c>
+  # Where to find workers.properties
+  JkWorkersFile conf/workers.properties
+
+  # Where to put jk logs
+  JkLogFile logs/mod_jk.log
+
+  # Set the jk log level [debug/error/info]
+  JkLogLevel error
+
+  # Select the log format
+  JkLogStampFormat "[%a %b %d %H:%M:%S %Y]"
+
+  # JkOptions indicates to send SSK KEY SIZE
+  JkOptions +ForwardKeySize +ForwardURICompat -ForwardDirectories
+
+  # JkRequestLogFormat
+  JkRequestLogFormat "%w %V %T %R"
+
+  # You can use external file for mount points.
+  JkMountFile conf/uriworkermap.properties
+
+  # Add shared memory.
+  JkShmFile /dev/shm/jk.shm
+
+  # Add jkstatus for managing runtime data
+  <Location /jkstatus/>
+    JkMount status
+    Order deny,allow
+    Deny from all
+    Allow from 127.0.0.1
+  </Location>
+</IfModule>

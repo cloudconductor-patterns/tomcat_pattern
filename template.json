@@ -1,0 +1,331 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "CloudConductor pattern template",
+
+  "Parameters" : {
+    "KeyName" : {
+      "Description" : "Name of an existing EC2/OpenStack KeyPair to enable SSH access to the instances",
+      "Type" : "String",
+      "MinLength" : "1",
+      "MaxLength" : "255",
+      "AllowedPattern" : "[\\x20-\\x7E]*",
+      "ConstraintDescription" : "can contain only ASCII characters."
+    },
+    "SSHLocation" : {
+      "Description" : "The IP address range that can be used to SSH to the EC2/OpenStack instances",
+      "Type" : "String",
+      "MinLength" : "9",
+      "MaxLength" : "18",
+      "Default" : "0.0.0.0/0",
+      "AllowedPattern" : "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription" : "must be a valid IP CIDR range of the form x.x.x.x/x."
+    },
+    "webInstanceType" : {
+      "Description" : "WebServer instance type",
+      "Type" : "String",
+      "Default" : "t2.small"
+    },
+    "apInstanceType" : {
+      "Description" : "APServer instance type",
+      "Type" : "String",
+      "Default" : "t2.small"
+    },
+    "dbInstanceType" : {
+      "Description" : "DBServer instance type",
+      "Type" : "String",
+      "Default" : "t2.small"
+    },
+    "webImageId" : {
+      "Description" : "WebServer Image Id. This parameter is automatically filled by CloudConductor.",
+      "Type" : "String"
+    },
+    "apImageId" : {
+      "Description" : "APServer Image Id. This parameter is automatically filled by CloudConductor.",
+      "Type" : "String"
+    },
+    "dbImageId" : {
+      "Description" : "DBServer Image Id. This parameter is automatically filled by CloudConductor.",
+      "Type" : "String"
+    },
+    "CloudConductorLocation" : {
+      "Description" : "The IP address range of CloudConductor server to enable serf rpc access to frontend instance. This parameter is automatically filled by CloudConductor.",
+      "Type" : "String",
+      "MinLength": "9",
+      "MaxLength": "18",
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+    }
+  },
+
+  "Mappings" : {
+  },
+
+  "Resources" : {
+    "VPC" : {
+      "Type" : "AWS::EC2::VPC",
+      "Properties" : {
+        "CidrBlock" : "10.0.0.0/16"
+      }
+    },
+    "Subnet" : {
+      "Type" : "AWS::EC2::Subnet",
+      "Properties" : {
+        "CidrBlock" : "10.0.1.0/24",
+        "VpcId" : { "Ref" : "VPC" }
+      }
+    },
+    "InternetGateway" : {
+      "Type" : "AWS::EC2::InternetGateway"
+    },
+    "VPCGatewayAttachment" : {
+      "Type" : "AWS::EC2::VPCGatewayAttachment",
+      "Properties" : {
+        "InternetGatewayId" : { "Ref" : "InternetGateway" },
+        "VpcId" : { "Ref" : "VPC" }
+      }
+    },
+    "RouteTable" : {
+      "Type" : "AWS::EC2::RouteTable",
+      "Properties" : {
+        "VpcId" : { "Ref" : "VPC" }
+      }
+    },
+    "RouteToInternetGateway" : {
+      "Type" : "AWS::EC2::Route",
+      "Properties" : {
+        "DestinationCidrBlock" : "0.0.0.0/0",
+        "GatewayId" : { "Ref" : "InternetGateway" },
+        "RouteTableId" : { "Ref" : "RouteTable" }
+      }
+    },
+    "SubnetRouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "Subnet" },
+        "RouteTableId" : { "Ref" : "RouteTable" }
+      }
+    },
+    "WebServer" : {
+      "Type" : "AWS::EC2::Instance",
+      "Metadata" : {
+        "Role" : "web"
+      },
+      "Properties" : {
+        "ImageId" : { "Ref" : "webImageId" },
+        "InstanceType" : { "Ref" : "webInstanceType" },
+        "KeyName" : { "Ref" : "KeyName" },
+        "NetworkInterfaces" : [{
+           "DeviceIndex" : "0",
+           "NetworkInterfaceId" : { "Ref" : "WebNetworkInterface" }
+        }],
+        "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
+          "#!/bin/sh -v\n",
+          "# Helper function\n",
+          "function error_exit\n",
+          "{\n",
+          "  /opt/aws/bin/cfn-signal -e 1 -r \"$1\" '", { "Ref" : "WebWaitHandle" }, "'\n",
+          "  exit 1\n",
+          "}\n",
+          "# Set Parameters\n",
+          "/bin/echo 'ROLE=web' > /opt/cloudconductor/config\n",
+          "/bin/echo 'SERF_JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
+          "# Run Serf\n",
+          "/etc/init.d/serf restart || error_exit 'Failed to start serf agent'\n",
+          "# Send success signal\n",
+          "/opt/aws/bin/cfn-signal -e 0 -r 'WebServer Setup complete' '", { "Ref" : "WebWaitHandle" }, "'\n"
+        ]]}},
+        "Tags" : [{"Key": "Name", "Value": "WebServer"}, {"Key": "Role", "Value": "web"}]
+      }
+    },
+    "WebNetworkInterface" : {
+      "Type" : "AWS::EC2::NetworkInterface",
+      "Properties" : {
+        "GroupSet" : [{"Ref": "SharedSecurityGroup"}, {"Ref": "WebSecurityGroup"}],
+        "SubnetId" : { "Ref" : "Subnet" }
+      }
+    },
+    "FrontendEIP" : {
+      "Type" : "AWS::EC2::EIP",
+      "DependsOn" : "VPCGatewayAttachment",
+      "Properties" : {
+        "Domain" : "vpc"
+      }
+    },
+    "EIPAssociation" : {
+      "Type" : "AWS::EC2::EIPAssociation",
+      "Properties" : {
+        "AllocationId" : { "Fn::GetAtt" : [ "FrontendEIP", "AllocationId" ]},
+        "NetworkInterfaceId" : { "Ref" : "WebNetworkInterface" }
+      }
+    },
+    "SharedSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Shared security group over all instances in platform/optional pattern",
+        "VpcId" : { "Ref" : "VPC" },
+        "SecurityGroupIngress" : [
+          {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "SSHLocation" }},
+          {"IpProtocol" : "tcp", "FromPort" : "7373", "ToPort" : "7373", "CidrIp" : { "Ref" : "CloudConductorLocation" }},
+          {"IpProtocol" : "tcp", "FromPort" : "7946", "ToPort" : "7946", "CidrIp" : "10.0.0.0/16"},
+          {"IpProtocol" : "tcp", "FromPort" : "8500", "ToPort" : "8500", "CidrIp" : { "Ref" : "CloudConductorLocation" }},
+          {"IpProtocol" : "tcp", "FromPort" : "8300", "ToPort" : "8302", "CidrIp" : "10.0.0.0/16"}
+        ]
+      }
+    },
+    "WebSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Enable SSH access, HTTP access via port 80 and Serf RPC access via port 7373",
+        "VpcId" : { "Ref" : "VPC" },
+        "SecurityGroupIngress" : [
+          {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"}
+        ]
+      }
+    },
+    "APServer" : {
+      "Type" : "AWS::EC2::Instance",
+      "DependsOn" : "WebWaitCondition",
+      "Metadata" : {
+        "Role" : "ap"
+      },
+      "Properties" : {
+        "ImageId" : { "Ref" : "apImageId" },
+        "InstanceType" : { "Ref" : "apInstanceType" },
+        "KeyName" : { "Ref" : "KeyName" },
+        "NetworkInterfaces" : [{
+           "DeviceIndex" : "0",
+           "AssociatePublicIpAddress" : true,
+           "SubnetId" : { "Ref" : "Subnet" },
+           "GroupSet" : [{"Ref": "SharedSecurityGroup"}, {"Ref": "APSecurityGroup"}]
+        }],
+        "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
+          "#!/bin/sh -v\n",
+          "# Helper function\n",
+          "function error_exit\n",
+          "{\n",
+          "  /opt/aws/bin/cfn-signal -e 1 -r \"$1\" '", { "Ref" : "APWaitHandle" }, "'\n",
+          "  exit 1\n",
+          "}\n",
+          "# Set Parameters\n",
+          "/bin/echo 'ROLE=ap' > /opt/cloudconductor/config\n",
+          "/bin/echo 'SERF_JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
+          "# Run Serf\n",
+          "/etc/init.d/serf restart || error_exit 'Failed to start serf agent'\n",
+          "# Send success signal\n",
+          "/opt/aws/bin/cfn-signal -e 0 -r 'APServer Setup complete' '", { "Ref" : "APWaitHandle" }, "'\n"
+        ]]}},
+        "Tags" : [{"Key": "Name", "Value": "APServer"}, {"Key": "Role", "Value": "ap"}]
+      }
+    },
+    "APSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Enable AJP access via port 8009",
+        "VpcId" : { "Ref" : "VPC" },
+        "SecurityGroupIngress" : [
+          {"IpProtocol" : "tcp", "FromPort" : "8009", "ToPort" : "8009", "SourceSecurityGroupId" : {"Ref": "WebSecurityGroup"}}
+        ]
+      }
+    },
+    "DBServer" : {
+      "Type" : "AWS::EC2::Instance",
+      "DependsOn" : "WebWaitCondition",
+      "Metadata" : {
+        "Role" : "db"
+      },
+      "Properties" : {
+        "ImageId" : { "Ref" : "dbImageId" },
+        "InstanceType" : { "Ref" : "dbInstanceType" },
+        "KeyName" : { "Ref" : "KeyName" },
+        "NetworkInterfaces" : [{
+           "DeviceIndex" : "0",
+           "AssociatePublicIpAddress" : true,
+           "SubnetId" : { "Ref" : "Subnet" },
+           "GroupSet" : [{"Ref": "SharedSecurityGroup"}, {"Ref": "DBSecurityGroup"}]
+        }],
+        "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
+          "#!/bin/sh -v\n",
+          "# Helper function\n",
+          "function error_exit\n",
+          "{\n",
+          "  /opt/aws/bin/cfn-signal -e 1 -r \"$1\" '", { "Ref" : "DBWaitHandle" }, "'\n",
+          "  exit 1\n",
+          "}\n",
+          "# Set Parameters\n",
+          "/bin/echo 'ROLE=db' > /opt/cloudconductor/config\n",
+          "/bin/echo 'SERF_JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
+          "# Run Serf\n",
+          "/etc/init.d/serf restart || error_exit 'Failed to start serf agent'\n",
+          "# Send success signal\n",
+          "/opt/aws/bin/cfn-signal -e 0 -r 'DBServer Setup complete' '", { "Ref" : "DBWaitHandle" }, "'\n"
+        ]]}},
+        "Tags" : [{"Key": "Name", "Value": "DBServer"}, {"Key": "Role", "Value": "db"}]
+      }
+    },
+    "DBSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Enable DB access via port 5432",
+        "VpcId" : { "Ref" : "VPC" },
+        "SecurityGroupIngress" : [
+          {"IpProtocol" : "tcp", "FromPort" : "5432", "ToPort" : "5432", "SourceSecurityGroupId" : {"Ref": "APSecurityGroup"}}
+        ]
+      }
+    },
+    "WebWaitHandle" : {
+      "Type" : "AWS::CloudFormation::WaitConditionHandle"
+    },
+    "WebWaitCondition" : {
+      "Type" : "AWS::CloudFormation::WaitCondition",
+      "DependsOn" : "WebServer",
+      "Properties" : {
+        "Handle" : { "Ref" : "WebWaitHandle" },
+        "Timeout" : "600"
+      }
+    },
+    "APWaitHandle" : {
+      "Type" : "AWS::CloudFormation::WaitConditionHandle"
+    },
+    "APWaitCondition" : {
+      "Type" : "AWS::CloudFormation::WaitCondition",
+      "DependsOn" : "APServer",
+      "Properties" : {
+        "Handle" : { "Ref" : "APWaitHandle" },
+        "Timeout" : "600"
+      }
+    },
+    "DBWaitHandle" : {
+      "Type" : "AWS::CloudFormation::WaitConditionHandle"
+    },
+    "DBWaitCondition" : {
+      "Type" : "AWS::CloudFormation::WaitCondition",
+      "DependsOn" : "DBServer",
+      "Properties" : {
+        "Handle" : { "Ref" : "DBWaitHandle" },
+        "Timeout" : "600"
+      }
+    }
+  },
+  "Outputs" : {
+    "FrontendAddress" : {
+      "Value" : { "Ref" : "FrontendEIP" },
+      "Description" : "Frontend DNS name or IP address to access serf rpc port from CloudConductor server. This output is required."
+    },
+    "VpcId" : {
+      "Value" : { "Ref" : "VPC" },
+      "Description" : "Reference of VPC to create subnet, security group on same VPC in optional pattern. This output is required."
+    },
+    "SubnetId" : {
+      "Value" : { "Ref" : "Subnet" },
+      "Description" : "Reference of subnet to connect same subnet when create instance in optional pattern. This output is required."
+    },
+    "ClusterAddress" : {
+      "Value" : { "Fn::GetAtt" : ["WebNetworkInterface", "PrimaryPrivateIpAddress"] },
+      "Description" : "Private IP Address to join cluster. This output is required."
+    },
+    "SharedSecurityGroup" : {
+      "Value" : { "Ref" : "SharedSecurityGroup" },
+      "Description" : "Reference of shared security group to add rules from optional pattern. This output is required."
+    }
+  }
+}

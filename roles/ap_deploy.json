@@ -1,0 +1,9 @@
+{
+  "name": "ap_deploy",
+  "description": "Deploys Java application",
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "run_list": [
+    "tomcat_part::deploy"
+  ]
+}

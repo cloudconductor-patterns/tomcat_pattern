@@ -1,0 +1,9 @@
+{
+  "name": "db_deploy",
+  "description": "Executes SQL query",
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+  "run_list": [
+    "postgresql_part::deploy"
+  ]
+}
