@@ -7,6 +7,7 @@ default['postgresql']['dir'] = "/var/lib/pgsql/#{node['postgresql']['version']}/
 default['postgresql']['server']['service_name'] = "postgresql-#{node['postgresql']['version']}"
 default['postgresql']['password']['postgres'] = 'todo_replace_random_password'
 default['postgresql']['config']['listen_addresses'] = '*'
+default['postgresql']['config']['data_directory'] = "#{node['postgresql']['dir']}"
 
 default['postgresql_part']['application']['database'] = 'application'
 default['postgresql_part']['application']['user'] = 'application'
