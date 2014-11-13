@@ -1,40 +1,14 @@
 require_relative '../spec_helper'
 
 describe 'backup_restore::configure_postgresql' do
-  let(:chef_run) do
-    runner = ChefSpec::SoloRunner.new(
-      cookbook_path: %w(site-cookbooks cookbooks),
-      platform:      'centos',
-      version:       '6.5'
-    ) do |node|
-      node.set['cloudconductor']['applications'] = {
-        dynamic_git_app: {
-          type: 'dynamic',
-          parameters: {
-            backup_directories: '/var/www/app'
-          }
-        }
-      }
-      node.set['backup_restore']['config']['use_proxy'] = 'localhost'
-      node.set['backup_restore']['sources']['postgresql'] = {
-        db_user: 'root',
-        db_password: '',
-        data_dir: '/etc',
-        run_user: 'mysql',
-        run_group: 'mysql'
-      }
-      node.set['backup_restore']['destinations']['s3'] = {
-        bucket: 'cloudconductor',
-        access_key_id: '1234',
-        secret_access_key: '4321',
-        region: 'us-east-1',
-        prefix: '/backup'
-      }
-    end
-    runner.converge(described_recipe)
-  end
+  let(:chef_run) { ChefSpec::SoloRunner.converge(described_recipe) }
 
   it 'create clon backup' do
+    log_dir = '2/var/log/backup'
+    chef_run.node.set['backup_restore']['log_dir'] = log_dir
+    chef_run.node.set['backup_restore']['sources']['postgresql']['schedule'] = '0 3 * * 0'
+    chef_run.converge(described_recipe)
+
     expect(chef_run).to ChefSpec::Matchers::ResourceMatcher.new(
       :backup_model,
       :create,
@@ -43,19 +17,35 @@ describe 'backup_restore::configure_postgresql' do
       description: 'Full Backup PostgreSQL database',
       schedule: {
         minute: '0',
-        hour: '2',
+        hour: '3',
         day: '*',
         month: '*',
         weekday: '0'
       },
       cron_options: {
         path: ENV['PATH'],
-        output_log: '/var/log/backup/backup.log'
+        output_log: "#{log_dir}/backup.log"
       }
     )
   end
 
-  it 'set_proxy_env' do
-    expect(chef_run).to run_ruby_block('set_proxy_env')
+  describe 'use proxy' do
+    it 'set proxy env' do
+      proxy_host = '127.0.0.250'
+      proxy_port = '8080'
+      chef_run.node.set['backup_restore']['config']['use_proxy'] = true
+      chef_run.node.set['backup_restore']['config']['proxy_host'] = proxy_host
+      chef_run.node.set['backup_restore']['config']['proxy_port'] = proxy_port
+      chef_run.converge(described_recipe)
+
+      expect(Chef::Util::FileEdit).to receive(:new)
+        .with('/etc/cron.d/postgresql_backup').and_return(Chef::Util::FileEdit.new(Tempfile.new('chefspec')))
+      expect_any_instance_of(Chef::Util::FileEdit).to receive(:insert_line_after_match)
+        .with(/# Crontab for/, "https_proxy=http://#{proxy_host}:#{proxy_port}/")
+      expect_any_instance_of(Chef::Util::FileEdit).to receive(:insert_line_after_match)
+        .with(/# Crontab for/, "http_proxy=http://#{proxy_host}:#{proxy_port}/")
+      expect_any_instance_of(Chef::Util::FileEdit).to receive(:write_file)
+      chef_run.ruby_block('set_proxy_env').old_run_action(:create)
+    end
   end
 end
