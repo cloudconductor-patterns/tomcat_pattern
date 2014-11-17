@@ -20,7 +20,7 @@ applications.each do |app_name, app|
       end
     end
 
-    postgresql_database "#{node['postgresql_part']['application']['database']}" do
+    postgresql_database node['postgresql_part']['application']['database'] do
       connection postgresql_connection_info
       sql lazy { ::File.read("#{Chef::Config[:file_cache_path]}/#{app_name}.sql") }
       action :query
