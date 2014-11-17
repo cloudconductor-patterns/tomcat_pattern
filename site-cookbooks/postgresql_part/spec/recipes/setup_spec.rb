@@ -2,37 +2,46 @@ require_relative '../spec_helper'
 require 'chefspec'
 
 describe 'postgresql_part::default' do
-  let(:chef_run) do
-    ChefSpec::SoloRunner.new(
-      cookbook_path: %w(cookbooks site-cookbooks),
-      platform: 'centos',
-      version: '6.5'
-    ).converge(described_recipe)
-  end
+  let(:chef_run) { ChefSpec::SoloRunner.new }
 
-  it 'include postgresql::server' do
-    expect(chef_run).to include_recipe 'postgresql::server'
-  end
-
-  it 'include postgresql::server' do
-    expect(chef_run).to include_recipe 'postgresql::server'
-  end
+  port = '5432'
+  dba_passwd = 'password'
+  app_user = 'app_user'
+  app_pass = 'app_pass'
+  app_db = 'app_db'
 
   postgresql_connection_info = {
     host: '127.0.0.1',
-    port: 5432,
+    port: port,
     username: 'postgres',
-    password: 'todo_replace_random_password'
+    password: dba_passwd
   }
+
+  before do
+    chef_run.node.set['postgresql']['config']['port'] = port
+    chef_run.node.set['postgresql']['password']['postgres'] = dba_passwd
+    chef_run.node.set['postgresql_part']['application']['user'] = app_user
+    chef_run.node.set['postgresql_part']['application']['password'] = app_pass
+    chef_run.node.set['postgresql_part']['application']['database'] = app_db
+    chef_run.converge(described_recipe)
+  end
+
+  it 'include server recipe of postgresql cookbook' do
+    expect(chef_run).to include_recipe 'postgresql::server'
+  end
+
+  it 'include ruby recipe of postgresql cookbook' do
+    expect(chef_run).to include_recipe 'postgresql::ruby'
+  end
 
   it 'create db user' do
     expect(chef_run).to ChefSpec::Matchers::ResourceMatcher.new(
       :postgresql_database_user,
       :create,
-      'application'
+      app_user
     ).with(
       connection: postgresql_connection_info,
-      password: 'todo_replace_random_password'
+      password: app_pass
     )
   end
 
@@ -40,10 +49,10 @@ describe 'postgresql_part::default' do
     expect(chef_run).to ChefSpec::Matchers::ResourceMatcher.new(
       :postgresql_database,
       :create,
-      'application'
+      app_db
     ).with(
       connection: postgresql_connection_info,
-      owner: 'application'
+      owner: app_user
     )
   end
 end

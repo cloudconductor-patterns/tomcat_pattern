@@ -1,81 +1,73 @@
 require_relative '../spec_helper'
 
 describe 'apache_part::setup' do
-  let(:chef_run) do
-    ChefSpec::SoloRunner.new(
-      cookbook_path: %w(cookbooks site-cookbooks),
-      platform: 'centos',
-      version: '6.5'
-    ) do |node|
-      node.set['apache_part']['mod_jk']['version'] = '1.2.40'
-      node.set['apache']['libexec_dir'] = '/usr/lib64/httpd/modules'
-      node.set['apache']['conf_dir'] = '/etc/httpd/conf'
-      node.set['apache']['dir'] = '/etc/httpd'
-      node.set['apache']['user'] = 'apache'
-      node.set['apache']['group'] = 'apache'
-    end.converge(described_recipe)
-  end
+  let(:chef_run) { ChefSpec::SoloRunner.new }
 
   before do
     stub_command('/usr/sbin/httpd -t').and_return(0)
-    allow(File).to receive(:exists?).and_call_original
-    allow(File).to receive(:exists?).with('/usr/lib64/httpd/modules/mod_jk.so').and_return('true')
+    chef_run.converge(described_recipe)
   end
 
   it 'install apache2' do
     expect(chef_run).to include_recipe('apache2')
   end
 
-  it 'installs a yum_package with httpd-devel' do
+  it 'install httpd-devel package' do
+    expect(chef_run.node['apache']['package']).to eq('httpd')
     expect(chef_run).to install_package('httpd-devel')
-    expect(chef_run).to_not install_package('not_httpd-devel')
   end
 
-  it 'Create tomcat_connectors' do
-    expect(chef_run).to create_remote_file('tomcat_connectors').with(
-      source: 'http://www.apache.org/dist/tomcat/tomcat-connectors/jk/tomcat-connectors-1.2.40-src.tar.gz',
-      path: "#{Chef::Config[:file_cache_path]}/tomcat-connectors-1.2.40-src.tar.gz"
-    )
+  describe 'mod_jk is not installed' do
+    before do
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with('/usr/lib64/httpd/modules/mod_jk.so').and_return(false)
+      chef_run.converge(described_recipe)
+    end
+
+    it 'download mod_jk archive file' do
+      expect(chef_run).to create_remote_file('tomcat_connectors')
+    end
+
+    it 'install mod_jk' do
+      expect(chef_run).to run_bash('install_mod_jk')
+    end
   end
 
-  it 'install mod_jk' do
-    expect(chef_run).to run_bash('install_mod_jk').with(
-      cwd: "#{Chef::Config[:file_cache_path]}",
-      code: <<-EOS
-    tar -zxvf #{Chef::Config[:file_cache_path]}/tomcat-connectors-1.2.40-src.tar.gz
-    cd tomcat-connectors-1.2.40-src/native
-    if [ -z "$PKG_CONFIG_PATH" ]; then
-      export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/lib64/pkgconfig
-    fi
-    ./configure --with-apxs=/usr/sbin/apxs
-    make
-    make install
-  EOS
-    )
+  describe 'mod_jk is installed' do
+    before do
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with('/usr/lib64/httpd/modules/mod_jk.so').and_return(true)
+      chef_run.converge(described_recipe)
+    end
+
+    it 'not download mod_jk archive file' do
+      expect(chef_run).to_not create_remote_file('tomcat_connectors')
+    end
+
+    it 'not install mod_jk' do
+      expect(chef_run).to_not run_bash('install_mod_jk')
+    end
   end
 
-  it 'touches with workers.properties' do
+  it 'create workers.properties' do
+    expect(chef_run.node['apache']['conf_dir']).to eq('/etc/httpd/conf')
     expect(chef_run).to touch_file('/etc/httpd/conf/workers.properties')
-    expect(chef_run).to_not touch_file('/etc/httpd/conf/not_workers.properties')
   end
 
-  it 'touches with uriworkermap.properties' do
+  it 'create uriworkermap.properties' do
+    expect(chef_run.node['apache']['conf_dir']).to eq('/etc/httpd/conf')
     expect(chef_run).to touch_file('/etc/httpd/conf/uriworkermap.properties')
-    expect(chef_run).to_not touch_file('/etc/httpd/conf/not_uriworkermap.properties')
   end
 
-  it 'create template_file to mod-jk.conf' do
+  it 'create mod-jk.conf from template' do
+    expect(chef_run.node['apache']['conf_dir']).to eq('/etc/httpd/conf')
     expect(chef_run).to create_template('/etc/httpd/conf-available/mod-jk.conf').with(
-      owner: 'apache',
-      group: 'apache',
       mode: '0664',
       source: 'mod-jk.conf.erb'
     )
   end
 
-  it 'create link to mod-jk.conf' do
-    link = chef_run.link('/etc/httpd/conf-enabled/mod-jk.conf')
-    expect(link).to link_to('/etc/httpd/conf-available/mod-jk.conf')
-    expect(link).to_not link_to('/etc/httpd/conf-available/not-mod-jk.conf')
+  it 'create link to available mod-jk conf from enabled conf' do
+    expect(chef_run.link('/etc/httpd/conf-enabled/mod-jk.conf')).to link_to('/etc/httpd/conf-available/mod-jk.conf')
   end
 end
