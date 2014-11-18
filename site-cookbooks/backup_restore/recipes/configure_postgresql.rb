@@ -38,5 +38,5 @@ ruby_block 'set_proxy_env' do
     file.write_file
     File.delete("#{cron_file}.old") if File.exist?("#{cron_file}.old")
   end
-  only_if node['backup_restore']['config']['use_proxy']
+  only_if { node['backup_restore']['config']['use_proxy'] }
 end
