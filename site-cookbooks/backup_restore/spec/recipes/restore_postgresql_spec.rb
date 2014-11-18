@@ -8,7 +8,8 @@ describe 'backup_restore::restore_postgresql' do
   backup_file = "#{tmp_dir}/#{backup_name}.tar"
 
   before do
-    allow_any_instance_of(Chef::Recipe).to receive(:`).and_return('psql (PostgreSQL) 9.3.5')
+    allow_any_instance_of(Mixlib::ShellOut).to receive(:run_command)
+    allow_any_instance_of(Mixlib::ShellOut).to receive(:stdout).and_return('psql (PostgreSQL) 9.3.5')
   end
 
   it 'extract full backup data from backup archive' do
@@ -48,7 +49,7 @@ describe 'backup_restore::restore_postgresql' do
 
   describe 'postgresql version is less than 9.3' do
     it 'extract full backup data from backup archive' do
-      allow_any_instance_of(Chef::Recipe).to receive(:`).and_return('psql (PostgreSQL) 9.2.0')
+      allow_any_instance_of(Mixlib::ShellOut).to receive(:stdout).and_return('psql (PostgreSQL) 9.2.0')
       allow(File).to receive(:exist?).and_call_original
       allow(File).to receive(:exist?).with(backup_file).and_return(true)
       allow(Dir).to receive(:exist?).and_call_original

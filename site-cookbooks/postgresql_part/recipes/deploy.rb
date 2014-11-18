@@ -28,7 +28,9 @@ applications.each do |app_name, app|
         cmd = ["sudo -u postgres /usr/bin/psql -d #{node['postgresql_part']['application']['database']}",
                "-qtA -c \"select count(*) from information_schema.tables where table_schema = 'public';\"",
                '2>&1'].join(' ')
-        `#{cmd}`.to_i > 0
+        shell = Mixlib::ShellOut.new(cmd)
+        shell.run_command
+        shell.stdout.to_i > 0
       end
     end
   end

@@ -17,20 +17,18 @@ describe 'backup_restore::fetch_s3' do
   end
 
   describe 'postgresql is include restore target sources' do
-    source_name = 'postgresql'
-
-    before do
-      chef_run.node.set['backup_restore']['restore']['target_sources'] = %w(source_name)
-      chef_run.converge(described_recipe)
-    end
-
     it 'download postgresql backup file' do
+      source_name = 'postgresql'
       backup_name = source_name
+      latest_backup_path = "s3://#{s3_bucket}/#{s3_prefix}/#{backup_name}/2014.10.01.00.00.00"
+
+      chef_run.node.set['backup_restore']['restore']['target_sources'] = %w(source_name)
 
       allow(::File).to receive(:exist?).and_call_original
       allow(::File).to receive(:exist?).with("#{tmp_dir}/restore/#{backup_name}.tar").and_return(false)
-      latest_backup_path = "s3://#{s3_bucket}/#{s3_prefix}/#{backup_name}/2014.10.01.00.00.00"
-      expect_any_instance_of(Chef::Recipe).to receive(:`).and_return(latest_backup_path)
+      allow_any_instance_of(Mixlib::ShellOut).to receive(:run_command)
+      allow_any_instance_of(Mixlib::ShellOut).to receive(:stdout).and_return("#{latest_backup_path}\n")
+
       chef_run.converge(described_recipe)
 
       expect(chef_run).to run_bash('download_backup_files').with(

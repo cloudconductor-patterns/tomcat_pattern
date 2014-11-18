@@ -69,7 +69,8 @@ describe 'postgresql_part::deploy' do
           db_name = 'app_db'
           chef_run.node.set['postgresql_part']['application']['database'] = db_name
 
-          expect_any_instance_of(Kernel).to receive(:`).and_return('0')
+          allow_any_instance_of(Mixlib::ShellOut).to receive(:runcommand)
+          allow_any_instance_of(Mixlib::ShellOut).to receive(:stdout).and_return('0')
 
           chef_run.converge(described_recipe)
 
@@ -88,7 +89,8 @@ describe 'postgresql_part::deploy' do
           db_name = 'app_db'
           chef_run.node.set['postgresql_part']['application']['database'] = db_name
 
-          expect_any_instance_of(Kernel).to receive(:`).and_return('1')
+          allow_any_instance_of(Mixlib::ShellOut).to receive(:runcommand)
+          allow_any_instance_of(Mixlib::ShellOut).to receive(:stdout).and_return('1')
           chef_run.converge(described_recipe)
 
           expect(chef_run).to_not ChefSpec::Matchers::ResourceMatcher.new(
