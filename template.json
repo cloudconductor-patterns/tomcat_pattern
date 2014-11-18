@@ -146,7 +146,7 @@
     },
     "FrontendEIP" : {
       "Type" : "AWS::EC2::EIP",
-      "DependsOn" : "VPCGatewayAttachment",
+      "DependsOn" : ["VPCGatewayAttachment", "SubnetRouteTableAssociation"],
       "Properties" : {
         "Domain" : "vpc"
       }
