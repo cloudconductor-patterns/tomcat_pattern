@@ -28,7 +28,8 @@ describe 'backup_restore::restore' do
       }
       chef_run.node.set['backup_restore']['restore']['target_sources'] = %w(postgresql)
 
-      allow_any_instance_of(Chef::Recipe).to receive(:`).and_return('psql (PostgreSQL) 9.3.5')
+      allow_any_instance_of(Mixlib::ShellOut).to receive(:run_command)
+      allow_any_instance_of(Mixlib::ShellOut).to receive(:stdout).and_return('psql (PostgreSQL) 9.3.5')
 
       chef_run.converge(described_recipe)
 
