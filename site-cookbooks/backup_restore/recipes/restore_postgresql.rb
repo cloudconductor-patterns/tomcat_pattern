@@ -3,7 +3,6 @@ source = node['backup_restore']['sources']['postgresql']
 backup_name = 'postgresql'
 backup_file = "#{tmp_dir}/#{backup_name}.tar"
 
-#version = `psql --version`.split(' ')[2]
 cmd = Mixlib::ShellOut.new('psql --version')
 cmd.run_command
 version = cmd.stdout.split(' ')[2]
