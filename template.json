@@ -166,8 +166,6 @@
         "VpcId" : { "Ref" : "VPC" },
         "SecurityGroupIngress" : [
           {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "SSHLocation" }},
-          {"IpProtocol" : "tcp", "FromPort" : "7373", "ToPort" : "7373", "CidrIp" : { "Ref" : "CloudConductorLocation" }},
-          {"IpProtocol" : "tcp", "FromPort" : "7946", "ToPort" : "7946", "CidrIp" : "10.0.0.0/16"},
           {"IpProtocol" : "tcp", "FromPort" : "8500", "ToPort" : "8500", "CidrIp" : { "Ref" : "CloudConductorLocation" }},
           {"IpProtocol" : "tcp", "FromPort" : "8300", "ToPort" : "8302", "CidrIp" : "10.0.0.0/16"}
         ]
@@ -176,7 +174,7 @@
     "WebSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
-        "GroupDescription" : "Enable SSH access, HTTP access via port 80 and Serf RPC access via port 7373",
+        "GroupDescription" : "Enable SSH access, HTTP access via port 80",
         "VpcId" : { "Ref" : "VPC" },
         "SecurityGroupIngress" : [
           {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"}
