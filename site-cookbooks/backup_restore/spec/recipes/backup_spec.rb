@@ -4,7 +4,6 @@ describe 'backup_restore::backup' do
   let(:chef_run) { ChefSpec::SoloRunner.new }
 
   describe 'postgres is includ backup enabled sources'do
-
     before do
       chef_run.node.set['backup_restore']['sources']['enabled'] = %w(postgresql)
       chef_run.converge(described_recipe)

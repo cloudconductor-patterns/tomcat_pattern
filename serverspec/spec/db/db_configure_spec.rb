@@ -5,7 +5,6 @@ describe port(5432) do
 end
 
 describe 'postgresql server' do
-
   hostname = '127.0.0.1'
   port = '5432'
   database = 'postgres'
