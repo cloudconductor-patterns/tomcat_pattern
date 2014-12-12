@@ -18,6 +18,8 @@ describe 'postgresql_part::default' do
   }
 
   before do
+    stub_command('ls /var/lib/pgsql/9.3/data/recovery.conf')
+
     chef_run.node.set['postgresql']['config']['port'] = port
     chef_run.node.set['postgresql']['password']['postgres'] = dba_passwd
     chef_run.node.set['postgresql_part']['application']['user'] = app_user
