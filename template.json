@@ -130,8 +130,6 @@
           "# Set Parameters\n",
           "/bin/echo 'ROLE=web' > /opt/cloudconductor/config\n",
           "/bin/echo 'JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
-          "# Run Consul\n",
-          "/etc/init.d/consul restart || error_exit 'Failed to start consul'\n",
           "# Send success signal\n",
           "/opt/aws/bin/cfn-signal -e 0 -r 'WebServer Setup complete' '", { "Ref" : "WebWaitHandle" }, "'\n"
         ]]}},
@@ -208,8 +206,6 @@
           "# Set Parameters\n",
           "/bin/echo 'ROLE=ap' > /opt/cloudconductor/config\n",
           "/bin/echo 'JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
-          "# Run Consul\n",
-          "/etc/init.d/consul restart || error_exit 'Failed to start consul'\n",
           "# Send success signal\n",
           "/opt/aws/bin/cfn-signal -e 0 -r 'APServer Setup complete' '", { "Ref" : "APWaitHandle" }, "'\n"
         ]]}},
@@ -253,8 +249,6 @@
           "# Set Parameters\n",
           "/bin/echo 'ROLE=db' > /opt/cloudconductor/config\n",
           "/bin/echo 'JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
-          "# Run Consul\n",
-          "/etc/init.d/consul restart || error_exit 'Failed to start consul'\n",
           "# Send success signal\n",
           "/opt/aws/bin/cfn-signal -e 0 -r 'DBServer Setup complete' '", { "Ref" : "DBWaitHandle" }, "'\n"
         ]]}},
