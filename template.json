@@ -48,7 +48,7 @@
       "Type" : "String"
     },
     "CloudConductorLocation" : {
-      "Description" : "The IP address range of CloudConductor server to enable serf rpc access to frontend instance.",
+      "Description" : "The IP address range of CloudConductor server to enable Consul api access to frontend instance.",
       "Type" : "String",
       "MinLength": "9",
       "MaxLength": "18",
@@ -129,9 +129,9 @@
           "}\n",
           "# Set Parameters\n",
           "/bin/echo 'ROLE=web' > /opt/cloudconductor/config\n",
-          "/bin/echo 'SERF_JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
-          "# Run Serf\n",
-          "/etc/init.d/serf restart || error_exit 'Failed to start serf agent'\n",
+          "/bin/echo 'JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
+          "# Run Consul\n",
+          "/etc/init.d/consul restart || error_exit 'Failed to start consul'\n",
           "# Send success signal\n",
           "/opt/aws/bin/cfn-signal -e 0 -r 'WebServer Setup complete' '", { "Ref" : "WebWaitHandle" }, "'\n"
         ]]}},
@@ -207,9 +207,9 @@
           "}\n",
           "# Set Parameters\n",
           "/bin/echo 'ROLE=ap' > /opt/cloudconductor/config\n",
-          "/bin/echo 'SERF_JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
-          "# Run Serf\n",
-          "/etc/init.d/serf restart || error_exit 'Failed to start serf agent'\n",
+          "/bin/echo 'JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
+          "# Run Consul\n",
+          "/etc/init.d/consul restart || error_exit 'Failed to start consul'\n",
           "# Send success signal\n",
           "/opt/aws/bin/cfn-signal -e 0 -r 'APServer Setup complete' '", { "Ref" : "APWaitHandle" }, "'\n"
         ]]}},
@@ -252,9 +252,9 @@
           "}\n",
           "# Set Parameters\n",
           "/bin/echo 'ROLE=db' > /opt/cloudconductor/config\n",
-          "/bin/echo 'SERF_JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
-          "# Run Serf\n",
-          "/etc/init.d/serf restart || error_exit 'Failed to start serf agent'\n",
+          "/bin/echo 'JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
+          "# Run Consul\n",
+          "/etc/init.d/consul restart || error_exit 'Failed to start consul'\n",
           "# Send success signal\n",
           "/opt/aws/bin/cfn-signal -e 0 -r 'DBServer Setup complete' '", { "Ref" : "DBWaitHandle" }, "'\n"
         ]]}},
@@ -308,7 +308,7 @@
   "Outputs" : {
     "FrontendAddress" : {
       "Value" : { "Ref" : "FrontendEIP" },
-      "Description" : "Frontend DNS name or IP address to access serf rpc port from CloudConductor server. This output is required."
+      "Description" : "Frontend DNS name or IP address to access Consul api port from CloudConductor server. This output is required."
     },
     "VpcId" : {
       "Value" : { "Ref" : "VPC" },
