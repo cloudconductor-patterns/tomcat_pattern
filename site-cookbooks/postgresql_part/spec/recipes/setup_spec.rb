@@ -7,7 +7,6 @@ describe 'postgresql_part::default' do
   port = '5432'
   dba_passwd = 'password'
   app_user = 'app_user'
-  app_pass = 'app_pass'
   app_db = 'app_db'
 
   postgresql_connection_info = {
@@ -18,12 +17,12 @@ describe 'postgresql_part::default' do
   }
 
   before do
+    allow_any_instance_of(Chef::Resource).to receive(:generate_password).and_return('GENERATED_PASSWORD')
     stub_command('ls /var/lib/pgsql/9.3/data/recovery.conf')
 
     chef_run.node.set['postgresql']['config']['port'] = port
     chef_run.node.set['postgresql']['password']['postgres'] = dba_passwd
     chef_run.node.set['postgresql_part']['application']['user'] = app_user
-    chef_run.node.set['postgresql_part']['application']['password'] = app_pass
     chef_run.node.set['postgresql_part']['application']['database'] = app_db
     chef_run.converge(described_recipe)
   end
@@ -43,7 +42,7 @@ describe 'postgresql_part::default' do
       app_user
     ).with(
       connection: postgresql_connection_info,
-      password: app_pass
+      password: 'GENERATED_PASSWORD'
     )
   end
 

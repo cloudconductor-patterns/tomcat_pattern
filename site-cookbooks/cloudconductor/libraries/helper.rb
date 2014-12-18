@@ -21,15 +21,8 @@ require 'cloud_conductor_utils/consul'
 
 module CloudConductor
   module Helper
-    def generate_random(key = '', size = 16)
-      seed = node[:cloudconductor][:seed].to_i
-      key_hash = key.each_byte.inject(0) { |a, e| a * 256 + e }
-      before_seed = srand(seed + key_hash)
-
-      result = size.times.map { rand(256).to_s(16).rjust(2, '0') }.join
-
-      srand(before_seed)
-      result
+    def generate_password(key = '')
+      OpenSSL::Digest::SHA256.hexdigest(node[:cloudconductor][:seed] + key)
     end
 
     def server_info(role)
