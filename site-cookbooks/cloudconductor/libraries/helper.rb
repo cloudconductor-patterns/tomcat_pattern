@@ -41,4 +41,3 @@ end
 
 Chef::Recipe.send(:include, CloudConductor::Helper)
 Chef::Resource.send(:include, CloudConductor::Helper)
-Chef::Provider.send(:include, CloudConductor::Helper)
