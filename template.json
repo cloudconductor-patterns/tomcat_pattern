@@ -155,7 +155,6 @@
     },
     "EIPAssociation" : {
       "Type" : "AWS::EC2::EIPAssociation",
-      "DependsOn" : "WebWaitCondition",
       "Properties" : {
         "AllocationId" : { "Fn::GetAtt" : [ "FrontendEIP", "AllocationId" ]},
         "NetworkInterfaceId" : { "Ref" : "WebNetworkInterface" }
