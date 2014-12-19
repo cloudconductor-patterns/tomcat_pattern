@@ -117,6 +117,7 @@
         "KeyName" : { "Ref" : "KeyName" },
         "NetworkInterfaces" : [{
            "DeviceIndex" : "0",
+           "AssociatePublicIpAddress" : true,
            "NetworkInterfaceId" : { "Ref" : "WebNetworkInterface" }
         }],
         "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
