@@ -164,7 +164,7 @@
         "VpcId" : { "Ref" : "VPC" },
         "SecurityGroupIngress" : [
           {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "SSHLocation" }},
-          {"IpProtocol" : "tcp", "FromPort" : "8500", "ToPort" : "8500", "CidrIp" : { "Ref" : "CloudConductorLocation" }},
+          {"IpProtocol" : "tcp", "FromPort" : "8501", "ToPort" : "8501", "CidrIp" : { "Ref" : "CloudConductorLocation" }},
           {"IpProtocol" : "tcp", "FromPort" : "8300", "ToPort" : "8302", "CidrIp" : "10.0.0.0/16"}
         ]
       }
