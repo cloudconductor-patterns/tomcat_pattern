@@ -36,22 +36,23 @@
       "Default" : "t2.small"
     },
     "webImageId" : {
-      "Description" : "WebServer Image Id. This parameter is automatically filled by CloudConductor.",
+      "Description" : "[computed] WebServer Image Id. This parameter is automatically filled by CloudConductor.",
       "Type" : "String"
     },
     "apImageId" : {
-      "Description" : "APServer Image Id. This parameter is automatically filled by CloudConductor.",
+      "Description" : "[computed] APServer Image Id. This parameter is automatically filled by CloudConductor.",
       "Type" : "String"
     },
     "dbImageId" : {
-      "Description" : "DBServer Image Id. This parameter is automatically filled by CloudConductor.",
+      "Description" : "[computed] DBServer Image Id. This parameter is automatically filled by CloudConductor.",
       "Type" : "String"
     },
     "CloudConductorLocation" : {
-      "Description" : "The IP address range of CloudConductor server to enable serf rpc access to frontend instance. This parameter is automatically filled by CloudConductor.",
+      "Description" : "The IP address range of CloudConductor server to enable serf rpc access to frontend instance.",
       "Type" : "String",
       "MinLength": "9",
       "MaxLength": "18",
+      "Default": "0.0.0.0/0",
       "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
       "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
     }
@@ -146,7 +147,7 @@
     },
     "FrontendEIP" : {
       "Type" : "AWS::EC2::EIP",
-      "DependsOn" : "VPCGatewayAttachment",
+      "DependsOn" : ["VPCGatewayAttachment", "SubnetRouteTableAssociation"],
       "Properties" : {
         "Domain" : "vpc"
       }

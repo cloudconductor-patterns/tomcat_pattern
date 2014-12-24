@@ -5,7 +5,6 @@ describe port(5432) do
 end
 
 describe 'postgresql server' do
-
   hostname = '127.0.0.1'
   port = '5432'
   database = 'postgres'
@@ -38,7 +37,7 @@ describe 'postgresql server' do
   end
 
   before(:all) do
-    backend.run_command(<<-EOS
+    Specinfra.backend.run_command(<<-EOS
       echo #{hostname}:#{port}:#{database}:#{root_user}:#{root_passwd} > ~/.pgpass
       echo #{hostname}:#{port}:#{app_db}:#{app_user}:#{app_passwd} >> ~/.pgpass
       chmod 600 ~/.pgpass
@@ -55,6 +54,6 @@ describe 'postgresql server' do
   end
 
   after(:all) do
-    backend.run_command('rm -f ~/.pgpass')
+    Specinfra.backend.run_command('rm -f ~/.pgpass')
   end
 end

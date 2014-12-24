@@ -12,8 +12,10 @@ node['backup_restore']['restore']['target_sources'].each do |source_type|
   end
   s3_path = URI.join("s3://#{s3['bucket']}", File.join(s3['prefix'], backup_name, '/')).to_s
   datetime_regexp = '[0-9]\{4\}.[0-9]\{2\}.[0-9]\{2\}.[0-9]\{2\}.[0-9]\{2\}.[0-9]\{2\}/$'
-  cmd = "/usr/bin/s3cmd ls #{s3_path} | grep '#{datetime_regexp}' | sort | awk 'END{print $2}'"
-  latest_backup_path = `#{cmd}`.chomp
+
+  s3cmd = Mixlib::ShellOut.new("/usr/bin/s3cmd ls #{s3_path} | grep '#{datetime_regexp}' | sort | awk 'END{print $2}'")
+  s3cmd.run_command
+  latest_backup_path = s3cmd.stdout.chomp
 
   # Download backup from S3
   bash 'download_backup_files' do

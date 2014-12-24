@@ -1,110 +1,168 @@
 require_relative '../spec_helper'
 
 describe 'tomcat_part::deploy' do
-  let(:chef_git_run) do
-    ChefSpec::SoloRunner.new(
-      cookbook_path: %w(cookbooks site-cookbooks),
-      platform: 'centos',
-      version: '6.5'
-    ) do |node|
-      node.set['cloudconductor']['servers'] = {
-        test_git_svr: {
-          roles: 'db',
-          private_ip: '10.0.0.3'
-        }
+  let(:chef_run) { ChefSpec::SoloRunner.new }
+
+  app_name = 'application'
+  db_private_ip = '172.0.0.10'
+
+  before do
+    chef_run.node.set['cloudconductor']['servers'] = {
+      db: {
+        roles: 'db',
+        private_ip: db_private_ip
       }
-      node.set['cloudconductor']['applications'] = {
-        test_git_app: {
-          type: 'dynamic',
-          protocol: 'git',
-          revision: 'HEAD',
-          url: 'https://github.com/test_git_app/test_git_app.git'
-        }
-      }
-      node.set['tomcat']['user'] = 'tomcat'
-      node.set['tomcat']['group'] = 'tomcat'
-      node.set['tomcat']['webapp_dir'] = '/var/lib/tomcat7/webapps'
-      node.set['tomcat']['context_dir'] = '/etc/tomcat7/Catalina/localhost'
-      node.set['tomcat_part']['datasource'] = 'jdbc/test'
-      node.set['tomcat_part']['database']['type'] = 'postgresql'
-      node.set['tomcat_part']['database']['name'] = 'application'
-      node.set['tomcat_part']['database']['user'] = 'application'
-      node.set['tomcat_part']['database']['password'] = 'pass'
-      node.set['tomcat_part']['database']['host'] = '10.0.0.3'
-      node.set['tomcat_part']['database']['port'] = 5432
-    end.converge(described_recipe)
-  end
-  let(:chef_http_run) do
-    ChefSpec::SoloRunner.new(
-      cookbook_path: %w(cookbooks site-cookbooks),
-      platform: 'centos',
-      version: '6.5'
-    ) do |node|
-      node.set['cloudconductor']['servers'] = {
-        test_http_svr: {
-          roles: 'db',
-          private_ip: '10.0.0.3'
-        }
-      }
-      node.set['cloudconductor']['applications'] = {
-        test_http_app: {
-          type: 'dynamic',
-          protocol: 'http',
-          revision: 'HEAD',
-          url: 'https://localhost/test_http_app.war'
-        }
-      }
-      node.set['tomcat']['user'] = 'tomcat'
-      node.set['tomcat']['group'] = 'tomcat'
-      node.set['tomcat']['webapp_dir'] = '/var/lib/tomcat7/webapps'
-      node.set['tomcat']['context_dir'] = '/etc/tomcat7/Catalina/localhost'
-      node.set['tomcat_part']['datasource'] = 'jdbc/test'
-      node.set['tomcat_part']['database']['type'] = 'postgresql'
-      node.set['tomcat_part']['database']['name'] = 'application'
-      node.set['tomcat_part']['database']['user'] = 'application'
-      node.set['tomcat_part']['database']['password'] = 'pass'
-      node.set['tomcat_part']['database']['host'] = '10.0.0.3'
-      node.set['tomcat_part']['database']['port'] = 5432
-    end.converge(described_recipe)
+    }
+    chef_run.node.set['cloudconductor']['applications'] = {
+      app_name => {}
+    }
+    chef_run.converge(described_recipe)
   end
 
-  it 'deploy app_name' do
-    expect(chef_git_run).to deploy_deploy('test_git_app').with(
-      repo: 'https://github.com/test_git_app/test_git_app.git',
-      revision: 'HEAD',
-      deploy_to: '/var/lib/tomcat7/webapps',
-      user: 'tomcat',
-      group: 'tomcat'
-    )
+  describe 'dynamic type applications are included in "cloudconductor applications"' do
+    before do
+      chef_run.node.set['cloudconductor']['applications'] = {
+        app_name => {
+          type: 'dynamic'
+        }
+      }
+      chef_run.converge(described_recipe)
+    end
+
+    describe 'application deploy protocol is git' do
+      it 'application deploy from git' do
+        git_url = 'https://github.com/cloudconductor/cloud_conductor.git'
+        git_version = '0.3'
+        tomcat_user = 'tomcat'
+        tomcat_group = 'passwd'
+        tomcat_webapp_dir = '/var/lib/tomcat7/webapps'
+
+        chef_run.node.set['cloudconductor']['applications'][app_name]['protocol'] = 'git'
+        chef_run.node.set['cloudconductor']['applications'][app_name]['url'] = git_url
+        chef_run.node.set['cloudconductor']['applications'][app_name]['revision'] = git_version
+        chef_run.node.set['tomcat']['user'] = tomcat_user
+        chef_run.node.set['tomcat']['group'] = tomcat_group
+        chef_run.node.set['tomcat']['webapp_dir'] = tomcat_webapp_dir
+        chef_run.converge(described_recipe)
+
+        expect(chef_run).to deploy_deploy(app_name).with(
+          repo: git_url,
+          revision: git_version,
+          deploy_to: tomcat_webapp_dir,
+          user: tomcat_user,
+          group: tomcat_group
+        )
+      end
+    end
+    describe 'application deploy protocol is http' do
+      it 'application download from git' do
+        url = 'http://cloudconductor.org/application.war'
+        tomcat_user = 'tomcat'
+        tomcat_group = 'passwd'
+        tomcat_webapp_dir = '/var/lib/tomcat7/webapps'
+        chef_run.node.set['cloudconductor']['applications'][app_name]['protocol'] = 'http'
+        chef_run.node.set['cloudconductor']['applications'][app_name]['url'] = url
+        chef_run.node.set['tomcat']['user'] = tomcat_user
+        chef_run.node.set['tomcat']['group'] = tomcat_group
+        chef_run.node.set['tomcat']['webapp_dir'] = tomcat_webapp_dir
+        chef_run.converge(described_recipe)
+
+        expect(chef_run).to create_remote_file(app_name).with(
+          source: url,
+          path: "#{tomcat_webapp_dir}/#{app_name}.war",
+          mode: '0644',
+          owner: tomcat_user,
+          group: tomcat_group
+        )
+      end
+    end
+
+    it 'create context xml' do
+      tomcat_user = 'tomcat'
+      tomcat_group = 'passwd'
+      context_dir = '/etc/tomcat7/Catalina/localhost'
+      db_settings = {
+        'type' => 'postgresql',
+        'name' => 'application',
+        'user' => 'application',
+        'password' => 'pass',
+        'host' => db_private_ip,
+        'port' => 5432
+      }
+      data_source = 'jdbc/test'
+
+      chef_run.node.set['tomcat']['user'] = tomcat_user
+      chef_run.node.set['tomcat']['group'] = tomcat_group
+      chef_run.node.set['tomcat']['context_dir'] = context_dir
+      chef_run.node.set['tomcat_part']['database'] = db_settings
+      chef_run.node.set['tomcat_part']['datasource'] = data_source
+      chef_run.converge(described_recipe)
+
+      expect(chef_run).to create_template("#{context_dir}/#{app_name}.xml").with(
+        source: 'context.xml.erb',
+        mode: '0644',
+        owner: tomcat_user,
+        group: tomcat_group,
+        variables: {
+          database: db_settings,
+          datasource: data_source
+        }
+      )
+    end
   end
 
-  it 'remote_file app_name' do
-    expect(chef_http_run).to create_remote_file('test_http_app').with(
-      source: 'https://localhost/test_http_app.war',
-      path: '/var/lib/tomcat7/webapps/test_http_app.war',
-      mode: '0644',
-      owner: 'tomcat',
-      group: 'tomcat'
-    )
-  end
-
-  it 'create template node["tomcat_part"]["context_dir"]/app_name.xml' do
-    expect(chef_git_run).to create_template('/etc/tomcat7/Catalina/localhost/test_git_app.xml').with(
-      source: 'context.xml.erb',
-      mode: '0644',
-      owner: 'tomcat',
-      group: 'tomcat',
-      variables: {
-        database: {
-          'type' => 'postgresql',
-          'name' => 'application',
-          'user' => 'application',
-          'password' => 'pass',
-          'host' => '10.0.0.3',
-          'port' => 5432
+  describe 'multiple dynamic type applications are included in "cloudconductor applications"' do
+    app2_name = 'app2'
+    before do
+      chef_run.node.set['cloudconductor']['applications'] = {
+        app_name => {
+          type: 'dynamic'
         },
-        datasource: 'jdbc/test'
+        app2_name => {
+          type: 'dynamic'
+        }
       }
-    )
+      chef_run.converge(described_recipe)
+    end
+    it 'download of all applications' do
+      chef_run.node.set['cloudconductor']['applications'][app_name]['protocol'] = 'git'
+      chef_run.node.set['cloudconductor']['applications'][app2_name]['protocol'] = 'git'
+      chef_run.converge(described_recipe)
+
+      expect(chef_run).to deploy_deploy(app_name)
+      expect(chef_run).to deploy_deploy(app2_name)
+    end
+    it 'create all applications context xml' do
+      context_dir = '/etc/tomcat7/Catalina/localhost'
+      chef_run.node.set['tomcat']['context_dir'] = context_dir
+      chef_run.converge(described_recipe)
+
+      expect(chef_run).to create_template("#{context_dir}/#{app_name}.xml")
+      expect(chef_run).to create_template("#{context_dir}/#{app2_name}.xml")
+    end
+  end
+
+  describe 'dynamic type applications as not included in "cloudconductor applications"' do
+    before do
+      chef_run.node.set['cloudconductor']['applications'] = {
+        app_name => {
+          type: 'statis'
+        }
+      }
+      chef_run.converge(described_recipe)
+    end
+    it 'not download of applications' do
+      chef_run.node.set['cloudconductor']['applications'][app_name]['protocol'] = 'git'
+      chef_run.converge(described_recipe)
+
+      expect(chef_run).to_not deploy_deploy(app_name)
+    end
+    it 'not create  context xml' do
+      context_dir = '/etc/tomcat7/Catalina/localhost'
+      chef_run.node.set['tomcat']['context_dir'] = context_dir
+      chef_run.converge(described_recipe)
+
+      expect(chef_run).to_not create_template("#{context_dir}/#{app_name}.xml")
+    end
   end
 end

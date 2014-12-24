@@ -1,4 +1,13 @@
 include_recipe 'cron'
+
+package 'zlib-devel' do
+  action :install
+end
+
+package 'xz-devel' do
+  action :install
+end
+
 # install gem backup with options --no-ri --no-rdoc before include_recipe 'backup'
 gem_package 'backup' do
   version node['backup']['version'] if node['backup']['version']
