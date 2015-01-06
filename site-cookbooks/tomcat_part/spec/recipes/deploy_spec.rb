@@ -85,7 +85,6 @@ describe 'tomcat_part::deploy' do
         'type' => 'postgresql',
         'name' => 'application',
         'user' => 'application',
-        'password' => 'pass',
         'host' => db_private_ip,
         'port' => 5432
       }
@@ -103,10 +102,11 @@ describe 'tomcat_part::deploy' do
         mode: '0644',
         owner: tomcat_user,
         group: tomcat_group,
-        variables: {
+        variables: hash_including(
           database: db_settings,
+          password: /[0-9a-f]{32}/,
           datasource: data_source
-        }
+        )
       )
     end
   end

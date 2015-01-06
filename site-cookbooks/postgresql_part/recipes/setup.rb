@@ -16,7 +16,7 @@ postgresql_connection_info = {
 
 postgresql_database_user node['postgresql_part']['application']['user'] do
   connection postgresql_connection_info
-  password node['postgresql_part']['application']['password']
+  password generate_password('database')
   action :create
 end
 
