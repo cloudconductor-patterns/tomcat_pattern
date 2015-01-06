@@ -22,7 +22,7 @@ require 'cloud_conductor_utils/consul'
 module CloudConductor
   module Helper
     def generate_password(key = '')
-      OpenSSL::Digest::SHA256.hexdigest(node[:cloudconductor][:seed] + key)
+      OpenSSL::Digest::SHA256.hexdigest(node[:cloudconductor][:salt] + key)
     end
 
     def server_info(role)
