@@ -1,0 +1,7 @@
+{
+  "service": {
+    "name": "httpd",
+    "port": 80
+    }
+  }
+}
