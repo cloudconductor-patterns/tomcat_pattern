@@ -53,18 +53,16 @@ describe 'postgresql_part::deploy' do
           db_host = '127.0.0.1'
           db_port = '5432'
           db_user = 'pgsql'
-          db_pass = 'pgpass'
 
           postgresql_connection_info = {
             host: db_host,
             port: db_port,
             username: db_user,
-            password: db_pass
+            password: /[0-9a-f]{32}/
           }
 
           chef_run.node.set['postgresql']['config']['port'] = db_port
           chef_run.node.set['postgresql_part']['application']['user'] = db_user
-          chef_run.node.set['postgresql_part']['application']['password'] = db_pass
 
           db_name = 'app_db'
           chef_run.node.set['postgresql_part']['application']['database'] = db_name
@@ -79,7 +77,7 @@ describe 'postgresql_part::deploy' do
             :query,
             db_name
           ).with(
-            connection: postgresql_connection_info
+            connection: hash_including(postgresql_connection_info)
           )
         end
       end

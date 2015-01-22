@@ -31,6 +31,7 @@ applications.each do |app_name, app|
     group node['tomcat']['group']
     variables(
       database: node['tomcat_part']['database'],
+      password: generate_password('database'),
       datasource: node['tomcat_part']['datasource']
     )
   end
