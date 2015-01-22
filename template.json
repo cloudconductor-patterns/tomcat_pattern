@@ -143,8 +143,7 @@
           "  fi\n",
           "  sleep 1\n",
           "done\n",
-          "/opt/aws/bin/cfn-signal -e 1 -r \"$1\" '", { "Ref" : "WebWaitHandle" }, "'\n",
-          "exit 1\n"
+          "error_exit 'Failed to join the consul cluster.'\n"
         ]]}},
         "Tags" : [{"Key": "Name", "Value": "WebServer"}, {"Key": "Role", "Value": "web"}]
       }
@@ -232,8 +231,7 @@
           "  fi\n",
           "  sleep 1\n",
           "done\n",
-          "/opt/aws/bin/cfn-signal -e 1 -r \"$1\" '", { "Ref" : "APWaitHandle" }, "'\n",
-          "exit 1\n"
+          "error_exit 'Failed to join the consul cluster.'\n"
         ]]}},
         "Tags" : [{"Key": "Name", "Value": "APServer"}, {"Key": "Role", "Value": "ap"}]
       }
@@ -288,8 +286,7 @@
           "  fi\n",
           "  sleep 1\n",
           "done\n",
-          "/opt/aws/bin/cfn-signal -e 1 -r \"$1\" '", { "Ref" : "DBWaitHandle" }, "'\n",
-          "exit 1\n"
+          "error_exit 'Failed to join the consul cluster.'\n"
         ]]}},
         "Tags" : [{"Key": "Name", "Value": "DBServer"}, {"Key": "Role", "Value": "db"}]
       }
