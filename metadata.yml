@@ -3,7 +3,7 @@ maintainer:       "TIS Inc."
 maintainer_email: "ccndctr@gmail.com"
 license:          "Apache v2.0"
 description:      "CloudConductor platform pattern for Java application"
-version:          "0.0.1"
+version:          "0.3.3"
 url:              "https://github.com/cloudconductor-patterns/tomcat_pattern"
 
 type:      "platform"
