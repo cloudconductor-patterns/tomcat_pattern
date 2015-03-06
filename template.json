@@ -109,7 +109,8 @@
     "WebServer" : {
       "Type" : "AWS::EC2::Instance",
       "Metadata" : {
-        "Role" : "web"
+        "Role" : "web",
+        "Frontend" : "true"
       },
       "Properties" : {
         "ImageId" : { "Ref" : "WebImageId" },
@@ -129,7 +130,9 @@
           "}\n",
           "# Set Parameters\n",
           "/bin/echo 'ROLE=web' >> /opt/cloudconductor/config\n",
-          "/bin/echo 'JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'STACK_NAME=", { "Ref": "AWS::StackName" }, "' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'RESOURCE_NAME=WebServer' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'REGION=", { "Ref": "AWS::Region" }, "' >> /opt/cloudconductor/config\n",
           "# Run Consul\n",
           "# this process is required because of init sequence.\n",
           "/etc/init.d/consul start || error_exit 'Failed to start consul agent'\n",
@@ -218,7 +221,9 @@
           "}\n",
           "# Set Parameters\n",
           "/bin/echo 'ROLE=ap' >> /opt/cloudconductor/config\n",
-          "/bin/echo 'JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'STACK_NAME=", { "Ref": "AWS::StackName" }, "' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'RESOURCE_NAME=APServer' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'REGION=", { "Ref": "AWS::Region" }, "' >> /opt/cloudconductor/config\n",
           "# Run Consul\n",
           "# this process is required because of init sequence.\n",
           "/etc/init.d/consul start || error_exit 'Failed to start consul agent'\n",
@@ -273,7 +278,9 @@
           "}\n",
           "# Set Parameters\n",
           "/bin/echo 'ROLE=db' >> /opt/cloudconductor/config\n",
-          "/bin/echo 'JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'STACK_NAME=", { "Ref": "AWS::StackName" }, "' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'RESOURCE_NAME=DBServer' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'REGION=", { "Ref": "AWS::Region" }, "' >> /opt/cloudconductor/config\n",
           "# Run Consul\n",
           "# this process is required because of init sequence.\n",
           "/etc/init.d/consul start || error_exit 'Failed to start consul agent'\n",
@@ -349,7 +356,7 @@
       "Value" : { "Ref" : "Subnet" },
       "Description" : "Reference of subnet to connect same subnet when create instance in optional pattern. This output is required."
     },
-    "ClusterAddress" : {
+    "ClusterAddresses" : {
       "Value" : { "Fn::GetAtt" : ["WebNetworkInterface", "PrimaryPrivateIpAddress"] },
       "Description" : "Private IP Address to join cluster. This output is required."
     },
