@@ -20,30 +20,30 @@
       "AllowedPattern" : "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
       "ConstraintDescription" : "must be a valid IP CIDR range of the form x.x.x.x/x."
     },
-    "webInstanceType" : {
+    "WebInstanceType" : {
       "Description" : "WebServer instance type",
       "Type" : "String",
       "Default" : "t2.small"
     },
-    "apInstanceType" : {
+    "ApInstanceType" : {
       "Description" : "APServer instance type",
       "Type" : "String",
       "Default" : "t2.small"
     },
-    "dbInstanceType" : {
+    "DbInstanceType" : {
       "Description" : "DBServer instance type",
       "Type" : "String",
       "Default" : "t2.small"
     },
-    "webImageId" : {
+    "WebImageId" : {
       "Description" : "[computed] WebServer Image Id. This parameter is automatically filled by CloudConductor.",
       "Type" : "String"
     },
-    "apImageId" : {
+    "ApImageId" : {
       "Description" : "[computed] APServer Image Id. This parameter is automatically filled by CloudConductor.",
       "Type" : "String"
     },
-    "dbImageId" : {
+    "DbImageId" : {
       "Description" : "[computed] DBServer Image Id. This parameter is automatically filled by CloudConductor.",
       "Type" : "String"
     },
@@ -112,8 +112,8 @@
         "Role" : "web"
       },
       "Properties" : {
-        "ImageId" : { "Ref" : "webImageId" },
-        "InstanceType" : { "Ref" : "webInstanceType" },
+        "ImageId" : { "Ref" : "WebImageId" },
+        "InstanceType" : { "Ref" : "WebInstanceType" },
         "KeyName" : { "Ref" : "KeyName" },
         "NetworkInterfaces" : [{
            "DeviceIndex" : "0",
@@ -199,8 +199,8 @@
         "Role" : "ap"
       },
       "Properties" : {
-        "ImageId" : { "Ref" : "apImageId" },
-        "InstanceType" : { "Ref" : "apInstanceType" },
+        "ImageId" : { "Ref" : "ApImageId" },
+        "InstanceType" : { "Ref" : "ApInstanceType" },
         "KeyName" : { "Ref" : "KeyName" },
         "NetworkInterfaces" : [{
            "DeviceIndex" : "0",
@@ -254,8 +254,8 @@
         "Role" : "db"
       },
       "Properties" : {
-        "ImageId" : { "Ref" : "dbImageId" },
-        "InstanceType" : { "Ref" : "dbInstanceType" },
+        "ImageId" : { "Ref" : "DbImageId" },
+        "InstanceType" : { "Ref" : "DbInstanceType" },
         "KeyName" : { "Ref" : "KeyName" },
         "NetworkInterfaces" : [{
            "DeviceIndex" : "0",
