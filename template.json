@@ -109,7 +109,8 @@
     "WebServer" : {
       "Type" : "AWS::EC2::Instance",
       "Metadata" : {
-        "Role" : "web"
+        "Role" : "web",
+        "Frontend" : "true"
       },
       "Properties" : {
         "ImageId" : { "Ref" : "WebImageId" },
@@ -349,7 +350,7 @@
       "Value" : { "Ref" : "Subnet" },
       "Description" : "Reference of subnet to connect same subnet when create instance in optional pattern. This output is required."
     },
-    "ClusterAddress" : {
+    "ClusterAddresses" : {
       "Value" : { "Fn::GetAtt" : ["WebNetworkInterface", "PrimaryPrivateIpAddress"] },
       "Description" : "Private IP Address to join cluster. This output is required."
     },
