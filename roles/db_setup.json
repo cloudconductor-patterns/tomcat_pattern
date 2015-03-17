@@ -1,10 +1,9 @@
 {
   "name": "db_setup",
-  "description": "Setups PostgreSQL and backup tools",
+  "description": "Setups PostgreSQL",
   "chef_type": "role",
   "json_class": "Chef::Role",
   "run_list": [
-    "postgresql_part::setup",
-    "backup_restore::setup"
+    "postgresql_part::setup"
   ]
 }

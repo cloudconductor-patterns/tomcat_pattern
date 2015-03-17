@@ -1,20 +1,9 @@
 {
   "name": "db_configure",
-  "description": "Configures PostgreSQL and backup",
+  "description": "Configures PostgreSQL",
   "chef_type": "role",
   "json_class": "Chef::Role",
-  "default_attributes": {
-    "backup_restore": {
-      "sources": {
-        "enabled": ["postgresql"]
-      },
-      "destinations": {
-        "enabled": ["s3"]
-      }
-    }
-  },
   "run_list": [
-    "postgresql_part::configure",
-    "backup_restore::configure"
+    "postgresql_part::configure"
   ]
 }
