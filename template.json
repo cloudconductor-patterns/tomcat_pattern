@@ -20,35 +20,35 @@
       "AllowedPattern" : "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
       "ConstraintDescription" : "must be a valid IP CIDR range of the form x.x.x.x/x."
     },
-    "webInstanceType" : {
+    "WebInstanceType" : {
       "Description" : "WebServer instance type",
       "Type" : "String",
       "Default" : "t2.small"
     },
-    "apInstanceType" : {
+    "ApInstanceType" : {
       "Description" : "APServer instance type",
       "Type" : "String",
       "Default" : "t2.small"
     },
-    "dbInstanceType" : {
+    "DbInstanceType" : {
       "Description" : "DBServer instance type",
       "Type" : "String",
       "Default" : "t2.small"
     },
-    "webImageId" : {
+    "WebImageId" : {
       "Description" : "[computed] WebServer Image Id. This parameter is automatically filled by CloudConductor.",
       "Type" : "String"
     },
-    "apImageId" : {
+    "ApImageId" : {
       "Description" : "[computed] APServer Image Id. This parameter is automatically filled by CloudConductor.",
       "Type" : "String"
     },
-    "dbImageId" : {
+    "DbImageId" : {
       "Description" : "[computed] DBServer Image Id. This parameter is automatically filled by CloudConductor.",
       "Type" : "String"
     },
     "CloudConductorLocation" : {
-      "Description" : "The IP address range of CloudConductor server to enable serf rpc access to frontend instance.",
+      "Description" : "The IP address range of CloudConductor server to enable Consul api access to frontend instance.",
       "Type" : "String",
       "MinLength": "9",
       "MaxLength": "18",
@@ -109,11 +109,12 @@
     "WebServer" : {
       "Type" : "AWS::EC2::Instance",
       "Metadata" : {
-        "Role" : "web"
+        "Role" : "web",
+        "Frontend" : "true"
       },
       "Properties" : {
-        "ImageId" : { "Ref" : "webImageId" },
-        "InstanceType" : { "Ref" : "webInstanceType" },
+        "ImageId" : { "Ref" : "WebImageId" },
+        "InstanceType" : { "Ref" : "WebInstanceType" },
         "KeyName" : { "Ref" : "KeyName" },
         "NetworkInterfaces" : [{
            "DeviceIndex" : "0",
@@ -128,12 +129,24 @@
           "  exit 1\n",
           "}\n",
           "# Set Parameters\n",
-          "/bin/echo 'ROLE=web' > /opt/cloudconductor/config\n",
-          "/bin/echo 'SERF_JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
-          "# Run Serf\n",
-          "/etc/init.d/serf restart || error_exit 'Failed to start serf agent'\n",
-          "# Send success signal\n",
-          "/opt/aws/bin/cfn-signal -e 0 -r 'WebServer Setup complete' '", { "Ref" : "WebWaitHandle" }, "'\n"
+          "/bin/echo 'ROLE=web' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'STACK_NAME=", { "Ref": "AWS::StackName" }, "' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'RESOURCE_NAME=WebServer' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'REGION=", { "Ref": "AWS::Region" }, "' >> /opt/cloudconductor/config\n",
+          "# Run Consul\n",
+          "# this process is required because of init sequence.\n",
+          "/etc/init.d/consul start || error_exit 'Failed to start consul agent'\n",
+          "# Wait member-join event\n",
+          "host_name=`hostname`\n",
+          "for i in `seq 10`; do\n",
+          "  if [ ! -z \"`/usr/local/bin/consul members | grep ${host_name}`\" ]; then\n",
+          "    # Send success signal\n",
+          "    /opt/aws/bin/cfn-signal -e 0 -r 'WebServer Setup complete' '", { "Ref" : "WebWaitHandle" }, "'\n",
+          "    exit 0\n",
+          "  fi\n",
+          "  sleep 1\n",
+          "done\n",
+          "error_exit 'Failed to join the consul cluster.'\n"
         ]]}},
         "Tags" : [{"Key": "Name", "Value": "WebServer"}, {"Key": "Role", "Value": "web"}]
       }
@@ -154,6 +167,7 @@
     },
     "EIPAssociation" : {
       "Type" : "AWS::EC2::EIPAssociation",
+      "DependsOn" : "WebServer",
       "Properties" : {
         "AllocationId" : { "Fn::GetAtt" : [ "FrontendEIP", "AllocationId" ]},
         "NetworkInterfaceId" : { "Ref" : "WebNetworkInterface" }
@@ -166,9 +180,7 @@
         "VpcId" : { "Ref" : "VPC" },
         "SecurityGroupIngress" : [
           {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "SSHLocation" }},
-          {"IpProtocol" : "tcp", "FromPort" : "7373", "ToPort" : "7373", "CidrIp" : { "Ref" : "CloudConductorLocation" }},
-          {"IpProtocol" : "tcp", "FromPort" : "7946", "ToPort" : "7946", "CidrIp" : "10.0.0.0/16"},
-          {"IpProtocol" : "tcp", "FromPort" : "8500", "ToPort" : "8500", "CidrIp" : { "Ref" : "CloudConductorLocation" }},
+          {"IpProtocol" : "tcp", "FromPort" : "8501", "ToPort" : "8501", "CidrIp" : { "Ref" : "CloudConductorLocation" }},
           {"IpProtocol" : "tcp", "FromPort" : "8300", "ToPort" : "8302", "CidrIp" : "10.0.0.0/16"}
         ]
       }
@@ -176,7 +188,7 @@
     "WebSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
-        "GroupDescription" : "Enable SSH access, HTTP access via port 80 and Serf RPC access via port 7373",
+        "GroupDescription" : "Enable SSH access, HTTP access via port 80",
         "VpcId" : { "Ref" : "VPC" },
         "SecurityGroupIngress" : [
           {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"}
@@ -190,8 +202,8 @@
         "Role" : "ap"
       },
       "Properties" : {
-        "ImageId" : { "Ref" : "apImageId" },
-        "InstanceType" : { "Ref" : "apInstanceType" },
+        "ImageId" : { "Ref" : "ApImageId" },
+        "InstanceType" : { "Ref" : "ApInstanceType" },
         "KeyName" : { "Ref" : "KeyName" },
         "NetworkInterfaces" : [{
            "DeviceIndex" : "0",
@@ -208,12 +220,24 @@
           "  exit 1\n",
           "}\n",
           "# Set Parameters\n",
-          "/bin/echo 'ROLE=ap' > /opt/cloudconductor/config\n",
-          "/bin/echo 'SERF_JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
-          "# Run Serf\n",
-          "/etc/init.d/serf restart || error_exit 'Failed to start serf agent'\n",
-          "# Send success signal\n",
-          "/opt/aws/bin/cfn-signal -e 0 -r 'APServer Setup complete' '", { "Ref" : "APWaitHandle" }, "'\n"
+          "/bin/echo 'ROLE=ap' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'STACK_NAME=", { "Ref": "AWS::StackName" }, "' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'RESOURCE_NAME=APServer' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'REGION=", { "Ref": "AWS::Region" }, "' >> /opt/cloudconductor/config\n",
+          "# Run Consul\n",
+          "# this process is required because of init sequence.\n",
+          "/etc/init.d/consul start || error_exit 'Failed to start consul agent'\n",
+          "# Wait member-join event\n",
+          "host_name=`hostname`\n",
+          "for i in `seq 10`; do\n",
+          "  if [ ! -z \"`/usr/local/bin/consul members | grep ${host_name}`\" ]; then\n",
+          "    # Send success signal\n",
+          "    /opt/aws/bin/cfn-signal -e 0 -r 'APServer Setup complete' '", { "Ref" : "APWaitHandle" }, "'\n",
+          "    exit 0\n",
+          "  fi\n",
+          "  sleep 1\n",
+          "done\n",
+          "error_exit 'Failed to join the consul cluster.'\n"
         ]]}},
         "Tags" : [{"Key": "Name", "Value": "APServer"}, {"Key": "Role", "Value": "ap"}]
       }
@@ -235,8 +259,8 @@
         "Role" : "db"
       },
       "Properties" : {
-        "ImageId" : { "Ref" : "dbImageId" },
-        "InstanceType" : { "Ref" : "dbInstanceType" },
+        "ImageId" : { "Ref" : "DbImageId" },
+        "InstanceType" : { "Ref" : "DbInstanceType" },
         "KeyName" : { "Ref" : "KeyName" },
         "NetworkInterfaces" : [{
            "DeviceIndex" : "0",
@@ -253,12 +277,24 @@
           "  exit 1\n",
           "}\n",
           "# Set Parameters\n",
-          "/bin/echo 'ROLE=db' > /opt/cloudconductor/config\n",
-          "/bin/echo 'SERF_JOIN_ADDRESS=", {"Fn::GetAtt": ["WebNetworkInterface", "PrimaryPrivateIpAddress"]}, "' >> /opt/cloudconductor/config\n",
-          "# Run Serf\n",
-          "/etc/init.d/serf restart || error_exit 'Failed to start serf agent'\n",
-          "# Send success signal\n",
-          "/opt/aws/bin/cfn-signal -e 0 -r 'DBServer Setup complete' '", { "Ref" : "DBWaitHandle" }, "'\n"
+          "/bin/echo 'ROLE=db' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'STACK_NAME=", { "Ref": "AWS::StackName" }, "' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'RESOURCE_NAME=DBServer' >> /opt/cloudconductor/config\n",
+          "/bin/echo 'REGION=", { "Ref": "AWS::Region" }, "' >> /opt/cloudconductor/config\n",
+          "# Run Consul\n",
+          "# this process is required because of init sequence.\n",
+          "/etc/init.d/consul start || error_exit 'Failed to start consul agent'\n",
+          "# Wait member-join event\n",
+          "host_name=`hostname`\n",
+          "for i in `seq 10`; do\n",
+          "  if [ ! -z \"`/usr/local/bin/consul members | grep ${host_name}`\" ]; then\n",
+          "    # Send success signal\n",
+          "    /opt/aws/bin/cfn-signal -e 0 -r 'DBServer Setup complete' '", { "Ref" : "DBWaitHandle" }, "'\n",
+          "    exit 0\n",
+          "  fi\n",
+          "  sleep 1\n",
+          "done\n",
+          "error_exit 'Failed to join the consul cluster.'\n"
         ]]}},
         "Tags" : [{"Key": "Name", "Value": "DBServer"}, {"Key": "Role", "Value": "db"}]
       }
@@ -310,7 +346,7 @@
   "Outputs" : {
     "FrontendAddress" : {
       "Value" : { "Ref" : "FrontendEIP" },
-      "Description" : "Frontend DNS name or IP address to access serf rpc port from CloudConductor server. This output is required."
+      "Description" : "Frontend DNS name or IP address to access Consul api port from CloudConductor server. This output is required."
     },
     "VpcId" : {
       "Value" : { "Ref" : "VPC" },
@@ -320,7 +356,7 @@
       "Value" : { "Ref" : "Subnet" },
       "Description" : "Reference of subnet to connect same subnet when create instance in optional pattern. This output is required."
     },
-    "ClusterAddress" : {
+    "ClusterAddresses" : {
       "Value" : { "Fn::GetAtt" : ["WebNetworkInterface", "PrimaryPrivateIpAddress"] },
       "Description" : "Private IP Address to join cluster. This output is required."
     },

@@ -11,4 +11,3 @@ default['postgresql']['config']['data_directory'] = node['postgresql']['dir']
 
 default['postgresql_part']['application']['database'] = 'application'
 default['postgresql_part']['application']['user'] = 'application'
-default['postgresql_part']['application']['password'] = 'todo_replace_random_password'

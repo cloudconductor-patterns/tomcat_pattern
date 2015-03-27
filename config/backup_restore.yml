@@ -1,0 +1,14 @@
+db:
+  paths:
+    - path: /var/cloudconductor/backups/postgresql
+      prepare_path: true
+      schedule: "0 0 * * *"
+      script:
+        pre_backup: ! '(sudo -u postgres pg_dumpall > /var/cloudconductor/backups/postgresql/dump.sql) >/dev/null 2>&1'
+        post_restore: ! '(sudo -u postgres psql -f /var/cloudconductor/backups/postgresql/dump.sql) >/dev/null 2>&1'
+      restore_enabled: true
+  privileges:
+    - user: postgres
+      command: /usr/bin/pg_dumpall
+    - user: postgres
+      command: /usr/bin/psql

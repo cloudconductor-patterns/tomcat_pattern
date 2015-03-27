@@ -1,3 +1,22 @@
+postgresql_connection_info = {
+  host: '127.0.0.1',
+  port: node['postgresql']['config']['port'],
+  username: 'postgres',
+  password: node['postgresql']['password']['postgres']
+}
+
+postgresql_database_user node['postgresql_part']['application']['user'] do
+  connection postgresql_connection_info
+  password generate_password('database')
+  action :create
+end
+
+postgresql_database node['postgresql_part']['application']['database'] do
+  connection postgresql_connection_info
+  owner node['postgresql_part']['application']['user']
+  action :create
+end
+
 # setting pg_hba.conf
 pg_hba = [
   { type: 'local', db: 'all', user: 'postgres', addr: nil, method: 'ident' },

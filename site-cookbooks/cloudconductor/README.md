@@ -1,7 +1,14 @@
 About
 =====
-This is the designed to build backup-restore system of tomcat pattern
-For more information, please visit README of tomcat pattern
+
+This is the common part of the platform pattern for build the system hosts Ruby on Rails based application.
+
+For more information, please visit README.md of Rails pattern.
+
+How to use part
+============
+
+please visit README.md of Rails pattern.
 
 Copyright and License
 =====================
@@ -22,10 +29,10 @@ limitations under the License.
 
 
 Contact
-=======
+=====
 
 For more information: <http://cloudconductor.org/>
 
-Report issues and requests: <https://github.com/cloudconductor-patterns/tomcat_pattern/issues>
+Report issues and requests: <https://github.com/cloudconductor-patterns/rails_pattern/issues>
 
 Send feedback to: <ccndctr@gmail.com>
