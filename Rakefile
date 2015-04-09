@@ -13,5 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 require 'rspec/core/rake_task'
+require 'rubocop/rake_task'
 
 RSpec::Core::RakeTask.new(:spec)
+
+desc 'Run rspec on the site-cookbooks directory'
+RSpec::Core::RakeTask.new(:chefspec) do |t|
+  t.pattern = 'site-cookbooks/**/*_spec.rb'
+  t.verbose = false
+end
+
+RuboCop::RakeTask.new
