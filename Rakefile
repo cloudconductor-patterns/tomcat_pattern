@@ -14,6 +14,7 @@
 # limitations under the License.
 require 'rspec/core/rake_task'
 require 'rubocop/rake_task'
+require 'foodcritic'
 
 RSpec::Core::RakeTask.new(:spec)
 
@@ -24,3 +25,9 @@ RSpec::Core::RakeTask.new(:chefspec) do |t|
 end
 
 RuboCop::RakeTask.new
+
+FoodCritic::Rake::LintTask.new(:foodcritic) do |t|
+  t.options = {
+    cookbook_paths: ['site-cookbooks']
+  }
+end
