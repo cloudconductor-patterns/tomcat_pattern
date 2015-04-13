@@ -16,18 +16,30 @@ require 'rspec/core/rake_task'
 require 'rubocop/rake_task'
 require 'foodcritic'
 
-RSpec::Core::RakeTask.new(:spec)
+# Rspec and ChefSpec
+desc 'Run Rspec examples'
+RSpec::Core::RakeTask.new(:rspec)
 
-desc 'Run rspec on the site-cookbooks directory'
+desc 'Run ChefSpec examples'
 RSpec::Core::RakeTask.new(:chefspec) do |t|
   t.pattern = 'site-cookbooks/**/*_spec.rb'
   t.verbose = false
 end
 
-RuboCop::RakeTask.new
+# Style tests, rubocop and Rubocop and FoodCritic
+namespace :style do
+  desc 'Run Ruby style checks'
+  RuboCop::RakeTask.new(:ruby)
 
-FoodCritic::Rake::LintTask.new(:foodcritic) do |t|
-  t.options = {
-    cookbook_paths: ['site-cookbooks']
-  }
+  desc 'Run Chef style checks'
+    FoodCritic::Rake::LintTask.new(:chef) do |t|
+      t.options = {
+        cookbook_paths: ['site-cookbooks']
+      }
+  end
 end
+
+desc 'Run all style checks'
+task style:['style:ruby', 'style:chef']
+
+task defauls: ['style', 'rspec', 'chefspec']
