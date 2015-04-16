@@ -27,7 +27,7 @@ describe file('/etc/httpd/conf-available/mod-jk.conf') do
   it { should be_grouped_into 'apache' }
 end
 
-describe file ('/etc/httpd/conf-enabled/mod-jk.conf') do
+describe file('/etc/httpd/conf-enabled/mod-jk.conf') do
   it { should be_file }
   it { should be_linked_to '/etc/httpd/conf-available/mod-jk.conf' }
 end
