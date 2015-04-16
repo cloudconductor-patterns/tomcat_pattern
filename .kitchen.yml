@@ -34,7 +34,7 @@ suites:
 
   - name: ap-server
     driver:
-      cc_role: 'web'
+      cc_role: 'ap'
     run_list:
       - role[ap_setup]
       - role[ap_configure]
@@ -54,7 +54,7 @@ suites:
 
   - name: db-server
     driver:
-      cc_role: 'web'
+      cc_role: 'db'
     run_list:
       - role[db_setup]
       - role[db_configure]
