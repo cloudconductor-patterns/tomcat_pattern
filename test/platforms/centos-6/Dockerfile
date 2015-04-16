@@ -8,7 +8,7 @@ ENV http_proxy <%= @http_proxy %>
 ENV https_proxy <%= @https_proxy %>
 <% end %>
 
-RUN sudo echo 'include_only=.jp' >> /etc/yum/pluginconf.d/fastestmirror.conf
+RUN echo 'include_only=.jp' >> /etc/yum/pluginconf.d/fastestmirror.conf
 
 RUN yum clean all
 RUN yum install -y sudo openssh-server openssh-clients which curl htop
