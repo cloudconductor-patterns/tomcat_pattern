@@ -1,0 +1,77 @@
+---
+driver:
+  name: docker
+  cc_pattern: "<%= File.basename(Dir.pwd) %>"
+
+provisioner:
+  name: chef_solo
+
+platforms:
+  - name: centos-6
+    driver:
+      dockerfile: test/platforms/centos-6/Dockerfile
+
+suites:
+  - name: web-server
+    driver:
+      cc_role: 'web'
+    run_list:
+      - role[web_setup]
+      - role[web_configure]
+      - role[web_deploy]
+    attributes:
+      cloudconductor:
+        servers:
+          ap_01:
+            private_ip: '127.0.0.1'
+            roles: 'ap'
+            weight: '0'
+        applications:
+          jpetstore:
+            type: 'dynamic'
+            protocol: 'http'
+            url: 'https://s3-ap-northeast-1.amazonaws.com/cloudconductor-test/sources/public/jpetstore.war'
+
+  - name: ap-server
+    driver:
+      cc_role: 'web'
+    run_list:
+      - role[ap_setup]
+      - role[ap_configure]
+      - role[ap_deploy]
+    attributes:
+      cloudconductor:
+        servers:
+          ap_01:
+            private_ip: '127.0.0.1'
+            roles: 'ap'
+            weight: '0'
+        applications:
+          jpetstore:
+            type: 'dynamic'
+            protocol: 'http'
+            url: 'https://s3-ap-northeast-1.amazonaws.com/cloudconductor-test/sources/public/jpetstore.war'
+
+  - name: db-server
+    driver:
+      cc_role: 'web'
+    run_list:
+      - role[db_setup]
+      - role[db_configure]
+      - role[db_deploy]
+    attributes:
+      cloudconductor:
+        servers:
+          ap_01:
+            private_ip: '127.0.0.1'
+            roles: 'ap'
+            weight: '0'
+        applications:
+          jpetstore:
+            type: 'dynamic'
+            protocol: 'http'
+            url: 'https://s3-ap-northeast-1.amazonaws.com/cloudconductor-test/sources/public/jpetstore.war'
+            parameters:
+              migration:
+                type: 'sql'
+                url: 'https://s3-ap-northeast-1.amazonaws.com/cloudconductor-test/sources/public/jpetstore_postgres.sql'

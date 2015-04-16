@@ -24,4 +24,6 @@ group :test do
   gem 'chef'
   gem 'berkshelf'
   gem 'foodcritic'
+  gem 'test-kitchen'
+  gem 'kitchen-docker'
 end
