@@ -1,15 +1,8 @@
 require 'spec_helper'
-
 require 'json'
 
-kitchen_attributes = open('/tmp/kitchen/dna.json') do |io|
-  JSON.load(io)
-end
-
 chef = ChefSpec::SoloRunner.new
-
-chef.node.normal_attrs = kitchen_attributes
-
+chef.node.normal_attrs = property[:chef_attributes]
 chef.converge('role[web_deploy]')
 
 describe service(chef.node['apache']['service_name']) do
