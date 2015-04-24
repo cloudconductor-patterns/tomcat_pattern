@@ -10,12 +10,13 @@ puts Dir.pwd
 
 if Dir.pwd == '/home/kitchen'
   pattern_root_dir = '/tmp/kitchen'
-  kitchen_attributes = open('/tmp/kitchen/dna.json') do |io|
+  #kitchen_attributes = open('/tmp/kitchen/dna.json') do |io|
+  kitchen_attributes = open(File.join(pattern_root_dir, 'dna.json')) do |io|
     JSON.load(io)
   end
   properties = { chef_attributes: kitchen_attributes }
 else
-  pattern_root_dir = '/opt/cloudconductor/patterns/tomcat_pattern'
+  pattern_root_dir = File.expand_path('../../../../')
 
   include ConsulParameters
   parameters = read_parameters
