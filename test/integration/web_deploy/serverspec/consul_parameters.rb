@@ -7,7 +7,7 @@ require 'uri'
 require 'cgi'
 
 module ConsulParameters
-  def read
+  def read_parameters
     parameters = {}
     begin
       consul_secret_key = ENV['CONSUL_SECRET_KEY'].nil? ? '' : CGI.escape(ENV['CONSUL_SECRET_KEY'])

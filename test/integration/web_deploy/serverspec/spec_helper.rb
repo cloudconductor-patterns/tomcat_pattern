@@ -1,19 +1,30 @@
 require 'serverspec'
 require 'chefspec'
 require 'ohai'
+require 'consul_parameters'
+require 'active_support'
 
 set :backend, :exec
 
-require 'consul_parameters'
+puts Dir.pwd
 
+if Dir.pwd == '/home/kitchen'
+  pattern_root_dir = '/tmp/kitchen'
+  kitchen_attributes = open('/tmp/kitchen/dna.json') do |io|
+    JSON.load(io)
+  end
+  properties = { chef_attributes: kitchen_attributes }
+else
+  pattern_root_dir = '/opt/cloudconductor/patterns/tomcat_pattern'
 
-pattern_root_dir = '/tmp/kitchen'
-
-kitchen_attributes = open('/tmp/kitchen/dna.json') do |io|
-  JSON.load(io)
+  include ConsulParameters
+  parameters = read_parameters
+  parameters[:cloudconductor][:servers] = read_servers
+  if parameters[:cloudconductor][:patterns][:tomcat_pattern][:user_attributes]
+    parameters.deep_merge!(parameters[:cloudconductor][:patterns][:tomcat_pattern][:user_attributes])
+  end
+  properties = { chef_attributes: parameters }
 end
-
-properties = { chef_attributes: kitchen_attributes }
 
 set_property properties
 
