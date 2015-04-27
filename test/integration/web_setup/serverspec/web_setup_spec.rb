@@ -1,38 +1,46 @@
-require 'spec_helper.rb'
+require 'spec_helper'
+require 'json'
 
-describe package('httpd') do
-  it { should be_installed }
-end
+describe 'web_setup' do
+  chef_run = ChefSpec::SoloRunner.new
 
-describe service('httpd') do
-  it { should be_enabled }
-  it { should be_running }
-end
+  before(:all) do
+    stub_command('/usr/sbin/httpd -t').and_return(0)
+    chef_run.node.normal_attrs = property[:chef_attributes]
+    chef_run.converge('role[web_setup]')
+  end
 
-describe package('httpd-devel') do
-  it { should be_installed }
-end
+  it 'is installed apache package' do
+    expect(package(chef_run.node['apache']['package'])).to be_installed
+  end
 
-describe file('/usr/lib64/httpd/modules/mod_jk.so') do
-  it { should be_file }
-end
+  it 'is s apache service enabled and running' do
+    expect(service(chef_run.node['apache']['service_name'])).to be_enabled.and be_running
+  end
 
-describe file('/etc/httpd/conf/workers.properties') do
-  it { should be_file }
-end
+  it 'is installed apache devel package' do
+    expect(package("#{chef_run.node['apache']['package']}-devel")).to be_installed
+  end
 
-describe file('/etc/httpd/conf/uriworkermap.properties') do
-  it { should be_file }
-end
+  it 'is exist a mod_jk.so file' do
+    expect(file("#{chef_run.node['apache']['libexec_dir']}/mod_jk.so")).to be_file
+  end
 
-describe file('/etc/httpd/conf-available/mod-jk.conf') do
-  it { should be_file }
-  it { should be_mode 664 }
-  it { should be_owned_by 'apache' }
-  it { should be_grouped_into 'apache' }
-end
+  it 'is exist a workers.properties file' do
+    expect(file("#{chef_run.node['apache']['conf_dir']}/workers.properties")).to be_file
+  end
 
-describe file('/etc/httpd/conf-enabled/mod-jk.conf') do
-  it { should be_file }
-  it { should be_linked_to '/etc/httpd/conf-available/mod-jk.conf' }
+  it 'is exist a uriworkermap.properties file' do
+    expect(file("#{chef_run.node['apache']['conf_dir']}/uriworkermap.properties")).to be_file
+  end
+
+  it 'is mod-jk.conf file set given mode, owned by a given user, grouped in to a given group, and exist' do
+    expect(file("#{chef_run.node['apache']['dir']}/conf-available/mod-jk.conf"))
+      .to be_file.and be_mode(664).and be_owned_by('apache').and be_grouped_into('apache')
+  end
+
+  it 'is conf-enabled/mod-jk.conf are linked to conf-available/mod-jk.conf' do
+    expect(file("#{chef_run.node['apache']['dir']}/conf-enabled/mod-jk.conf"))
+      .to be_linked_to "#{chef_run.node['apache']['dir']}/conf-available/mod-jk.conf"
+  end
 end
