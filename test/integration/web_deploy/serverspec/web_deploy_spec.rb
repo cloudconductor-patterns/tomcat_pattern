@@ -1,27 +1,37 @@
 require 'spec_helper'
 require 'json'
 
-chef = ChefSpec::SoloRunner.new
-chef.node.normal_attrs = property[:chef_attributes]
-chef.converge('role[web_deploy]')
+describe 'web_deploy' do
+  chef_run = ChefSpec::SoloRunner.new
 
-describe service(chef.node['apache']['service_name']) do
-  it { should be_running }
-end
-
-chef.node['apache']['listen_ports'].each do |listen_port|
-  describe port(listen_port) do
-    it { should be_listening.with('tcp') }
+  before(:all) do
+    chef_run.node.normal_attrs = property[:chef_attributes]
+    chef_run.converge('role[web_deploy]')
   end
-end
 
-describe file("#{chef.node['apache']['conf_dir']}/uriworkermap.properties") do
-  it { should be_file }
-  it { should be_mode 664 }
-  it { should be_owned_by chef.node['apache']['user'] }
-  it { should be_grouped_into chef.node['apache']['group'] }
-  chef.node['cloudconductor']['applications'].keys.each do |key|
-    it { should contain("/#{key}=loadbalancer") }
-    it { should contain("/#{key}/*=loadbalancer") }
+  it do
+    expect(service(chef_run.node['apache']['service_name'])).to be_running
+  end
+
+  it do
+    chef_run.node['apache']['listen_ports'].each do |listen_port|
+      expect(port(listen_port)).to be_listening.with('tcp')
+    end
+  end
+
+  it do
+    expect(file("#{chef_run.node['apache']['conf_dir']}/uriworkermap.properties"))
+      .to be_file
+      .and be_mode(664)
+      .and be_owned_by(chef_run.node['apache']['user'])
+      .and be_grouped_into(chef_run.node['apache']['group'])
+  end
+
+  it do
+    chef_run.node['cloudconductor']['applications'].keys.each do |key|
+      expect(file("#{chef_run.node['apache']['conf_dir']}/uriworkermap.properties"))
+        .to contain("/#{key}=loadbalancer")
+        .and contain("/#{key}/*=loadbalancer")
+    end
   end
 end
