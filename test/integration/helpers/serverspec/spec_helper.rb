@@ -6,8 +6,6 @@ require 'active_support'
 
 set :backend, :exec
 
-puts Dir.pwd
-
 if Dir.pwd == '/home/kitchen'
   pattern_root_dir = '/tmp/kitchen'
   kitchen_attributes = open(File.join(pattern_root_dir, 'dna.json')) do |io|
