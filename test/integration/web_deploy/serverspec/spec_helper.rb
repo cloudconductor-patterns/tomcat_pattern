@@ -15,7 +15,7 @@ if Dir.pwd == '/home/kitchen'
   end
   properties = { chef_attributes: kitchen_attributes }
 else
-  pattern_root_dir = File.expand_path('../../../../')
+  pattern_root_dir = File.expand_path('../../../../', File.dirname(__FILE__))
 
   include ConsulParameters
   parameters = read_parameters
