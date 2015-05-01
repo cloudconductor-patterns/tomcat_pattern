@@ -84,32 +84,11 @@ suites:
             type: 'dynamic'
             protocol: 'http'
             url: 'https://s3-ap-northeast-1.amazonaws.com/cloudconductor-test/sources/public/jpetstore.war'
-
-  - name: ap_configure
-    driver:
-      cc_role: 'ap'
-    run_list:
-      - role[ap_setup]
-      - role[ap_configure]
-    attributes:
-      cloudconductor:
-        servers:
-          ap_01:
-            private_ip: '127.0.0.1'
-            roles: 'ap'
-            weight: '0'
-        applications:
-          jpetstore:
-            type: 'dynamic'
-            protocol: 'http'
-            url: 'https://s3-ap-northeast-1.amazonaws.com/cloudconductor-test/sources/public/jpetstore.war'
-
   - name: ap_deploy
     driver:
       cc_role: 'ap'
     run_list:
       - role[ap_setup]
-      - role[ap_configure]
       - role[ap_deploy]
     attributes:
       cloudconductor:
