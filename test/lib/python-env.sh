@@ -37,7 +37,7 @@ run() {
   [ -z "$T" ] || set -T
 }
 
-python_exec() {
+pyenv_activate() {
   work_dir=$(pwd)
 
   run which python
@@ -83,6 +83,10 @@ python_exec() {
     deactivate
     return 1
   fi
+}
+
+python_exec() {
+  pyenv_activate || return $?
 
   run python $@
   if [ $status -ne 0 ] ; then
