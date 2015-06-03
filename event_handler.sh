@@ -41,6 +41,7 @@ set_ruby_path() {
 
     echo "export PATH=\$PATH:${ruby_home}/bin" > ${CHEF_ENV_FILE}
     export PATH=${ruby_home}/bin:${PATH}
+  fi
 }
 
 install_berkshelf() {
