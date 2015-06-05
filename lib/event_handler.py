@@ -152,7 +152,12 @@ def consul_kv_keys(prefix):
 
 
 def read_parameters():
-    return consul_kv_get('cloudconductor/parameters')
+    try:
+        ret = consul_kv_get('cloudconductor/parameters')
+    except Exception as e:
+        logging.warn("%s: %s", type(e), e.message)
+        ret = {}
+    return ret
 
 
 def pattern(data, name):
@@ -162,12 +167,18 @@ def pattern(data, name):
 def read_servers():
     servers = {}
     prefix = 'cloudconductor/servers/'
-    keys = consul_kv_keys(prefix)
 
-    for key in keys:
-        hostname = key[len(prefix):]
-        info = consul_kv_get(key)
-        servers[hostname] = info
+    try:
+        keys = consul_kv_keys(prefix)
+
+        for key in keys:
+            hostname = key[len(prefix):]
+            info = consul_kv_get(key)
+            servers[hostname] = info
+
+    except Exception as e:
+        logging.warn("%s: %s", type(e), e.message)
+        servers = {}
 
     return servers
 

@@ -372,6 +372,17 @@ class TestEventHandler(unittest.TestCase):
                          [((berks_cmd, ),),
                           ((chef_cmd, ),)])
 
+    def test_read_parameters(self):
+
+        ret = event_handler.read_parameters()
+
+        self.assertEqual(ret, {})
+
+    def test_read_servers(self):
+
+        ret = event_handler.read_servers()
+        self.assertEqual(ret, {})
+
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestEventHandler)
