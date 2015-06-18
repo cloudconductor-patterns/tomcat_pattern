@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+## version 1.0.1 (2015/06/18)
+
+  - Support to pre/post deploy script.
+  - Add dependency to build resources in the correct order.
+
 ## version 1.0.0 (2015/03/27)
 
   - Support CloudConductor v1.0.
