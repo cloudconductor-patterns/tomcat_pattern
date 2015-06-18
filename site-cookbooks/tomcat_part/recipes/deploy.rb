@@ -24,6 +24,15 @@ applications.each do |app_name, app|
       group node['tomcat']['group']
     end
   end
+
+  app_dir = "#{node['tomcat']['webapp_dir']}"
+
+  bash "pre_deploy_script_#{app_name}" do
+    cwd app_dir
+    code app['pre_deploy']
+    only_if { app['pre_deploy'] && !app['pre_deploy'].empty? }
+  end
+
   template "#{node['tomcat']['context_dir']}/#{app_name}.xml" do
     source 'context.xml.erb'
     mode '0644'
@@ -34,5 +43,11 @@ applications.each do |app_name, app|
       password: generate_password('database'),
       datasource: node['tomcat_part']['datasource']
     )
+  end
+
+  bash "post_deploy_script_#{app_name}" do
+    cwd app_dir
+    code app['post_deploy']
+    only_if { app['post_deploy'] && !app['post_deploy'].empty? }
   end
 end
