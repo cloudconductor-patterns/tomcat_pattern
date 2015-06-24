@@ -25,7 +25,7 @@ applications.each do |app_name, app|
     end
   end
 
-  app_dir = "#{node['tomcat']['webapp_dir']}"
+  app_dir = node['tomcat']['webapp_dir']
 
   bash "pre_deploy_script_#{app_name}" do
     cwd app_dir
