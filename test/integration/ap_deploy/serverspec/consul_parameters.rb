@@ -1,8 +1,6 @@
 require 'net/http'
 require 'json'
 require 'base64'
-# require 'active_support'
-# require 'net/http'
 require 'uri'
 require 'cgi'
 
