@@ -17,7 +17,6 @@ require 'chef/recipe'
 require 'chef/resource'
 require 'chef/provider'
 
-require 'cloud_conductor_utils/consul'
 
 module CloudConductor
   module Helper
@@ -26,6 +25,7 @@ module CloudConductor
     end
 
     def server_info(role)
+      require 'cloud_conductor_utils/consul'
       all_servers = CloudConductorUtils::Consul.read_servers
       servers = all_servers.select do |_hostname, server|
         server[:roles].include?(role)
