@@ -1,0 +1,6 @@
+source 'https://rubygems.org'
+
+gem 'serverspec'
+gem 'chefspec'
+gem 'activesupport'
+gem 'cloud_conductor_utils', git: 'https://github.com/cloudconductor/cloud_conductor_utils.git'
