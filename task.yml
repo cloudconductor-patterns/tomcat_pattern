@@ -1,0 +1,108 @@
+environments:
+  HOME: /root
+  PATH: $PATH:/opt/chefdk/embedded/bin:/opt/chef/embedded/bin:/usr/bin
+  ROLE: '{{config.role}}'
+  CONSUL_SECRET_KEY: '{{config.token}}'
+
+variables:
+  backup_directory: /var/cloudconductor/backups/postgresql
+
+default:
+  timeout: 1800
+
+events:
+  setup:
+    description: Execute setup
+    task: setup
+
+  configure:
+    description: Execute configure chef
+    priority: 50
+    ordered_tasks:
+      - service: postgresql
+        task: configure
+      - service: tomcat
+        task: configure
+      - service: apache
+        task: configure
+
+  spec:
+    description: Execute spec
+    task: spec
+
+  deploy:
+    description: Execute deploy
+    task: deploy
+
+  backup:
+    description: Execute backup
+    priority: 20
+    ordered_tasks:
+      - service: postgresql
+        task: backup
+
+  restore:
+    description: Execute restore
+    priority: 80
+    ordered_tasks:
+      - service: postgresql
+        task: restore_database
+      - service: postgresql
+        task: configure
+
+tasks:
+  setup:
+    description: Execute setup chef
+    operations:
+      - execute:
+          file: prepare.sh
+      - chef:
+          run_list:
+            - role[{{role}}_setup]
+
+  configure:
+    description: Execute configure chef
+    operations:
+      - chef:
+          run_list:
+            - role[{{role}}_configure]
+
+  spec:
+    description: Execute serverspec
+    operations:
+      - execute:
+          script: python lib/event_handler.py {{role}} spec
+
+  deploy:
+    description: Execute deploy chef
+    operations:
+      - chef:
+          run_list:
+            - role[{{role}}_deploy]
+
+  backup:
+    description: Backup database
+    operations:
+      - execute:
+          script: |
+            rm -rf {{backup_directory}}/*
+            sudo -u postgres pg_basebackup -D {{backup_directory}} --xlog --verbose -h 127.0.0.1 -U replication
+            chown -R amandabackup:disk {{backup_directory}}
+
+  restore_database:
+    description: Restore database on primary
+    operations:
+      - service:
+          name: postgresql-9.4
+          action: stop
+      - execute:
+          script: |
+            if [ -d {{backup_directory}} ]; then
+              rm -rf /var/lib/pgsql/9.4/data/*
+              mv {{backup_directory}}/* /var/lib/pgsql/9.4/data
+              chown -R postgres:postgres /var/lib/pgsql/9.4/data
+              chmod 700 /var/lib/pgsql/9.4/data
+            fi
+      - service:
+          name: postgresql-9.4
+          action: start
