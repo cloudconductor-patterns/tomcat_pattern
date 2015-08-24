@@ -85,9 +85,7 @@ tasks:
     operations:
       - execute:
           script: |
-            rm -rf {{backup_directory}}/*
-            sudo -u postgres pg_basebackup -D {{backup_directory}} --xlog --verbose -h 127.0.0.1 -U replication
-            chown -R amandabackup:disk {{backup_directory}}
+            sudo -u postgres pg_dumpall > {{backup_directory}}/dump.sql
 
   restore_database:
     description: Restore database on primary
@@ -97,11 +95,8 @@ tasks:
           action: stop
       - execute:
           script: |
-            if [ -d {{backup_directory}}/pg_hba.conf ]; then
-              rm -rf /var/lib/pgsql/9.3/data/*
-              mv {{backup_directory}}/* /var/lib/pgsql/9.3/data
-              chown -R postgres:postgres /var/lib/pgsql/9.3/data
-              chmod 700 /var/lib/pgsql/9.3/data
+            if [ -d {{backup_directory}}/dump.sql ]; then
+              sudo -u postgres psql -f {{backup_directory}}/dump.sql
             fi
       - service:
           name: postgresql-9.3
