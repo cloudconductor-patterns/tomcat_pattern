@@ -23,7 +23,7 @@ events:
         task: configure
       - service: tomcat
         task: configure
-      - service: apache
+      - service: httpd
         task: configure
 
   spec:
