@@ -45,6 +45,8 @@ events:
     description: Execute restore
     priority: 80
     ordered_tasks:
+      - service: tomcat
+        task: restart_tomcat
       - service: postgresql
         task: restore_database
       - service: postgresql
@@ -85,7 +87,14 @@ tasks:
     operations:
       - execute:
           script: |
-            sudo -u postgres pg_dumpall > {{backup_directory}}/dump.sql
+            sudo -u postgres pg_dumpall -c > {{backup_directory}}/dump.sql
+
+  restart_tomcat:
+    description: Restart tomcat to disconnect to database
+    operations:
+      - service:
+          name: tomcat7
+          action: restart
 
   restore_database:
     description: Restore database on primary
