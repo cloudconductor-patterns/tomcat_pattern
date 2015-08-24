@@ -97,7 +97,7 @@ tasks:
           action: stop
       - execute:
           script: |
-            if [ -d {{backup_directory}} ]; then
+            if [ -d {{backup_directory}}/pg_hba.conf ]; then
               rm -rf /var/lib/pgsql/9.3/data/*
               mv {{backup_directory}}/* /var/lib/pgsql/9.3/data
               chown -R postgres:postgres /var/lib/pgsql/9.3/data
