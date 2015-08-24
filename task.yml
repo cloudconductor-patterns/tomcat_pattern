@@ -95,7 +95,7 @@ tasks:
           action: stop
       - execute:
           script: |
-            if [ -d {{backup_directory}}/dump.sql ]; then
+            if [ -f {{backup_directory}}/dump.sql ]; then
               sudo -u postgres psql -f {{backup_directory}}/dump.sql
             fi
       - service:
