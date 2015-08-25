@@ -35,7 +35,7 @@ describe 'tomcat_part::deploy' do
         git_version = '0.3'
         tomcat_user = 'tomcat'
         tomcat_group = 'passwd'
-        tomcat_webapp_dir = '/var/lib/tomcat7/webapps'
+        tomcat_webapp_dir =  File.join(Dir.tmpdir, "#{app_name}")
 
         chef_run.node.set['cloudconductor']['applications'][app_name]['protocol'] = 'git'
         chef_run.node.set['cloudconductor']['applications'][app_name]['url'] = git_url
@@ -59,17 +59,16 @@ describe 'tomcat_part::deploy' do
         url = 'http://cloudconductor.org/application.war'
         tomcat_user = 'tomcat'
         tomcat_group = 'passwd'
-        tomcat_webapp_dir = '/var/lib/tomcat7/webapps'
+        source_path = File.join(Dir.tmpdir, "#{app_name}.war")
         chef_run.node.set['cloudconductor']['applications'][app_name]['protocol'] = 'http'
         chef_run.node.set['cloudconductor']['applications'][app_name]['url'] = url
         chef_run.node.set['tomcat']['user'] = tomcat_user
         chef_run.node.set['tomcat']['group'] = tomcat_group
-        chef_run.node.set['tomcat']['webapp_dir'] = tomcat_webapp_dir
         chef_run.converge(described_recipe)
 
         expect(chef_run).to create_remote_file(app_name).with(
           source: url,
-          path: "#{tomcat_webapp_dir}/#{app_name}.war",
+          path: source_path,
           mode: '0644',
           owner: tomcat_user,
           group: tomcat_group
