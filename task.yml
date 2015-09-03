@@ -9,6 +9,9 @@ variables:
 
 default:
   timeout: 1800
+  chef:
+    attribute_keys:
+      - cloudconductor
 
 events:
   setup:
