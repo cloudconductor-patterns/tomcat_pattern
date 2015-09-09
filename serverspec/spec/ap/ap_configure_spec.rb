@@ -7,3 +7,11 @@ end
 describe port(8009) do
   it { should be_listening.with('tcp') }
 end
+
+describe port(12345) do
+  it { should be_listening.with('tcp') }
+end
+
+describe port(12346) do
+  it { should be_listening.with('tcp') }
+end
