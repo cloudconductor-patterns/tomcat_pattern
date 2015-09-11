@@ -90,6 +90,8 @@ tasks:
     operations:
       - execute:
           script: |
+            mkdir -p {{backup_directory}}
+            chmod 777 {{backup_directory}}
             sudo -u postgres pg_dumpall -c > {{backup_directory}}/dump.sql
 
   restart_tomcat:
