@@ -1,3 +1,5 @@
 all:
   - /var/log/message*
   - /var/log/secure*
+web:
+  - /var/log/httpd/mod_jk.log
