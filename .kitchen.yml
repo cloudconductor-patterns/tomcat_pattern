@@ -7,9 +7,9 @@ provisioner:
   name: chef_solo
 
 platforms:
-  - name: centos-6
+  - name: centos-6.6
     driver:
-      dockerfile: test/platforms/centos-6/Dockerfile
+      dockerfile: test/platforms/centos-6.6/Dockerfile
 
 suites:
   - name: web_setup

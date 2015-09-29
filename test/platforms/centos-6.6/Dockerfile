@@ -1,4 +1,4 @@
-FROM centos:centos6
+FROM centos:centos6.6
 
 ENV LANG=en_US.UTF-8
 <% if @http_proxy %>
@@ -13,7 +13,7 @@ RUN echo 'include_only=.jp' >> /etc/yum/pluginconf.d/fastestmirror.conf
 RUN yum clean all
 RUN yum install -y sudo openssh-server openssh-clients which curl htop
 
-RUN yum update -y
+# RUN yum update -y
 RUN yum install -y sudo passwd openssh-server openssh-clients bind-utils git tar wget which curl-devel perl-devel autoconf unzip gcc gcc-c++
 
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key
