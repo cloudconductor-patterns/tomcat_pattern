@@ -1,0 +1,111 @@
+environments:
+  HOME: /root
+  PATH: $PATH:/opt/chefdk/embedded/bin:/opt/chef/embedded/bin:/usr/bin
+  ROLE: '{{config.role}}'
+  CONSUL_SECRET_KEY: '{{config.token}}'
+
+variables:
+  backup_directory: /var/cloudconductor/backups/postgresql
+
+default:
+  timeout: 1800
+  chef:
+    attribute_keys:
+      - cloudconductor
+
+events:
+  setup:
+    description: Execute setup
+    task: setup
+
+  configure:
+    description: Execute configure chef
+    priority: 50
+    ordered_tasks:
+      - service: postgresql
+        task: configure
+      - service: tomcat
+        task: configure
+      - service: httpd
+        task: configure
+
+  spec:
+    description: Execute spec
+    task: spec
+
+  deploy:
+    description: Execute deploy
+    task: deploy
+
+  backup:
+    description: Execute backup
+    priority: 20
+    ordered_tasks:
+      - service: postgresql
+        task: backup
+
+  restore:
+    description: Execute restore
+    priority: 80
+    ordered_tasks:
+      - service: tomcat
+        task: restart_tomcat
+      - service: postgresql
+        task: restore_database
+      - service: postgresql
+        task: configure
+
+tasks:
+  setup:
+    description: Execute setup chef
+    operations:
+      - execute:
+          file: prepare.sh
+      - chef:
+          run_list:
+            - role[{{role}}_setup]
+
+  configure:
+    description: Execute configure chef
+    operations:
+      - chef:
+          run_list:
+            - role[{{role}}_configure]
+
+  spec:
+    description: Execute serverspec
+    operations:
+      - execute:
+          script: python lib/serverspec.py {{role}}
+
+  deploy:
+    description: Execute deploy chef
+    operations:
+      - chef:
+          run_list:
+            - role[{{role}}_deploy]
+
+  backup:
+    description: Backup database
+    operations:
+      - execute:
+          script: |
+            mkdir -p {{backup_directory}}
+            chmod 777 {{backup_directory}}
+            sudo -u postgres pg_dumpall -c > {{backup_directory}}/dump.sql
+
+  restart_tomcat:
+    description: Restart tomcat to disconnect to database
+    operations:
+      - service:
+          name: tomcat7
+          action: restart
+
+  restore_database:
+    description: Restore database on primary
+    operations:
+      - execute:
+          script: |
+            if [ -f {{backup_directory}}/dump.sql ]; then
+              sudo -u postgres psql -f {{backup_directory}}/dump.sql
+            fi

@@ -37,13 +37,12 @@ describe 'postgresql server' do
   end
 
   before(:all) do
-    Specinfra.backend.run_command(
-      <<-EOS
-        echo #{hostname}:#{port}:#{database}:#{root_user}:#{root_passwd} > ~/.pgpass
-        echo #{hostname}:#{port}:#{app_db}:#{app_user}:#{app_passwd} >> ~/.pgpass
-        chmod 600 ~/.pgpass
+    Specinfra.backend.run_command(<<-EOS
+      echo #{hostname}:#{port}:#{database}:#{root_user}:#{root_passwd} > ~/.pgpass
+      echo #{hostname}:#{port}:#{app_db}:#{app_user}:#{app_passwd} >> ~/.pgpass
+      chmod 600 ~/.pgpass
       EOS
-    )
+                                 )
   end
 
   describe command("psql -U #{root_user} -d #{database} -h #{hostname} -p #{port} -c '\\l'") do

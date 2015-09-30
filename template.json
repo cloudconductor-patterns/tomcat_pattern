@@ -246,10 +246,11 @@
     "APSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
-        "GroupDescription" : "Enable AJP access via port 8009",
+        "GroupDescription" : "Enable AJP access via / JMX access",
         "VpcId" : { "Ref" : "VPC" },
         "SecurityGroupIngress" : [
-          {"IpProtocol" : "tcp", "FromPort" : "8009", "ToPort" : "8009", "SourceSecurityGroupId" : {"Ref": "WebSecurityGroup"}}
+          {"IpProtocol" : "tcp", "FromPort" : "8009", "ToPort" : "8009", "SourceSecurityGroupId" : {"Ref": "WebSecurityGroup"}},
+          {"IpProtocol" : "tcp", "FromPort" : "12345", "ToPort" : "12346", "CidrIp" : "10.0.0.0/16"}
         ]
       }
     },

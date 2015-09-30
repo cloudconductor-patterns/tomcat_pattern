@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
 gem 'rake'
-gem 'cloud_conductor_utils', git: 'https://github.com/cloudconductor/cloud_conductor_utils.git'
 
 group :development do
   gem 'guard'
@@ -24,4 +23,6 @@ group :test do
   gem 'chef'
   gem 'berkshelf'
   gem 'foodcritic'
+  gem 'test-kitchen'
+  gem 'kitchen-docker'
 end

@@ -7,25 +7,33 @@ applications = node['cloudconductor']['applications'].select { |_app_name, app| 
 applications.each do |app_name, app|
   case app['protocol']
   when 'git'
+    source_path = File.join(Dir.tmpdir, app_name)
+
     deploy app_name do
       repo app['url']
       revision app['revision'] || 'HEAD'
-      deploy_to node['tomcat']['webapp_dir']
+      deploy_to source_path
       user node['tomcat']['user']
       group node['tomcat']['group']
       action :deploy
     end
   when 'http'
+    source_path = File.join(Dir.tmpdir, "#{app_name}.war")
+
     remote_file app_name do
       source app['url']
-      path File.join(node['tomcat']['webapp_dir'], "#{app_name}.war")
+      path source_path
       mode '0644'
       owner node['tomcat']['user']
       group node['tomcat']['group']
     end
   end
 
-  app_dir = "#{node['tomcat']['webapp_dir']}"
+  bash app_name do
+    code "mv #{source_path} #{node['tomcat']['webapp_dir']}"
+  end
+
+  app_dir = node['tomcat']['webapp_dir']
 
   bash "pre_deploy_script_#{app_name}" do
     cwd app_dir
