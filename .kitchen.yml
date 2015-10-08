@@ -9,7 +9,8 @@ provisioner:
 platforms:
   - name: centos-6.6
     driver:
-      dockerfile: test/platforms/centos-6.6/Dockerfile
+      dockerfile: test/platforms/centos/Dockerfile
+      image: centos:centos6.6
 
 suites:
   - name: web_setup
