@@ -1,6 +1,6 @@
 variable "bootstrap_expect" {}
 variable "vpc_id" {}
-variable "subnet_id" {}
+variable "subnet_ids" {}
 variable "shared_security_group" {}
 variable "key_name" {}
 variable "web_image" {}
@@ -61,7 +61,7 @@ resource "aws_instance" "web_server" {
   instance_type = "${var.web_instance_type}"
   key_name = "${var.key_name}"
   vpc_security_group_ids = ["${aws_security_group.web_security_group.id}", "${var.shared_security_group}"]
-  subnet_id = "${element(split(", ", var.subnet_id), count.index)}"
+  subnet_id = "${element(split(", ", var.subnet_ids), count.index)}"
   associate_public_ip_address = true
   tags {
     Name = "WebServer"
@@ -75,7 +75,7 @@ resource "aws_instance" "ap_server" {
   instance_type = "${var.ap_instance_type}"
   key_name = "${var.key_name}"
   vpc_security_group_ids = ["${aws_security_group.ap_security_group.id}", "${var.shared_security_group.id}"]
-  subnet_id = "${element(split(", ", var.subnet_id), count.index)}"
+  subnet_id = "${element(split(", ", var.subnet_ids), count.index)}"
   associate_public_ip_address = true
   tags {
     Name = "APServer"
@@ -89,7 +89,7 @@ resource "aws_instance" "db_server" {
   instance_type = "${var.db_instance_type}"
   key_name = "${var.key_name}"
   vpc_security_group_ids = ["${aws_security_group.db_security_group.id}", "${var.shared_security_group.id}"]
-  subnet_id = "${element(split(", ", var.subnet_id), count.index)}"
+  subnet_id = "${element(split(", ", var.subnet_ids), count.index)}"
   associate_public_ip_address = true
   tags {
     Name = "DBServer"
