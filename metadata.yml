@@ -11,8 +11,11 @@ dependencies: ["cloud_conductor_init"]
 conflicts: []
 
 providers:
-    aws: terraform
-    openstack: terraform
+    aws:
+      - cloud_formation
+      - terraform
+    openstack:
+      - terraform
 
 supports:
   - platform: "centos"
