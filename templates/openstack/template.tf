@@ -1,4 +1,3 @@
-variable "bootstrap_expect" {}
 variable "subnet_ids" {}
 variable "shared_security_group" {}
 variable "key_name" {}
