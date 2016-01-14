@@ -1,16 +1,3 @@
-variable "subnet_ids" {}
-variable "shared_security_group" {}
-variable "key_name" {}
-variable "web_image" {}
-variable "ap_image" {}
-variable "db_image" {}
-variable "web_instance_type" {}
-variable "ap_instance_type" {}
-variable "db_instance_type" {}
-variable "web_server_size" {}
-variable "ap_server_size" {}
-variable "db_server_size" {}
-
 resource "openstack_compute_floatingip_v2" "main" {
   count = "${var.web_server_size}"
   pool = "public"

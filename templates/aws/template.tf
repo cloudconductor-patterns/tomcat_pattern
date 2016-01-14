@@ -1,17 +1,3 @@
-variable "vpc_id" {}
-variable "subnet_ids" {}
-variable "shared_security_group" {}
-variable "key_name" {}
-variable "web_image" {}
-variable "ap_image" {}
-variable "db_image" {}
-variable "web_instance_type" {}
-variable "ap_instance_type" {}
-variable "db_instance_type" {}
-variable "web_server_size" {}
-variable "ap_server_size" {}
-variable "db_server_size" {}
-
 resource "aws_security_group" "web_security_group" {
   name = "WebSecurityGroup"
   description = "Enable SSH access, HTTP access via port 80"
