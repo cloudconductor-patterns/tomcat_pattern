@@ -35,7 +35,7 @@ describe 'tomcat_part::deploy' do
         git_version = '0.3'
         tomcat_user = 'tomcat'
         tomcat_group = 'passwd'
-        tomcat_webapp_dir =  File.join(Dir.tmpdir, "#{app_name}")
+        tomcat_webapp_dir = File.join(Dir.tmpdir, "#{app_name}")
 
         chef_run.node.set['cloudconductor']['applications'][app_name]['protocol'] = 'git'
         chef_run.node.set['cloudconductor']['applications'][app_name]['url'] = git_url

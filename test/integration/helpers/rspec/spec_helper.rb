@@ -6,7 +6,7 @@ require 'active_support'
 
 set :backend, :exec
 
-if Dir.pwd == '/tmp/busser/suites/rspec'
+if Dir.pwd == '/tmp/verifier/suites/rspec'
   pattern_root_dir = '/tmp/kitchen'
   kitchen_attributes = open(File.join(pattern_root_dir, 'dna.json')) do |io|
     JSON.load(io)
