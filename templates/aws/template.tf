@@ -1,3 +1,8 @@
+resource "aws_eip" "web_server_eip" {
+  vpc = "true"
+  instance = "${aws_instance.web_server.id}"
+}
+
 resource "aws_security_group" "web_security_group" {
   name = "WebSecurityGroup"
   description = "Enable SSH access, HTTP access via port 80"
