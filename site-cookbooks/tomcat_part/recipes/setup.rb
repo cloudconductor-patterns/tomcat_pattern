@@ -1,8 +1,29 @@
-yum_repository 'jpackage' do
-  description 'JPackage 6 generic'
-  mirrorlist 'http://www.jpackage.org/mirrorlist.php?dist=generic&type=free&release=6.0'
-  gpgcheck false
-  action :create
+# yum_repository 'jpackage' do
+#  description 'JPackage 6 generic'
+#  mirrorlist 'http://www.jpackage.org/mirrorlist.php?dist=generic&type=free&release=6.0'
+#  gpgcheck false
+#  action :create
+# end
+
+execute 'update' do
+  command 'yum update -y'
+end
+
+if node['tomcat_part']['use_jpackage']
+  package 'yum-plugin-priorities'
+
+  remote_file "#{Chef::Config['file_cache_path']}/jpackage-release-6-3.jpp6.noarch.rpm" do
+    source 'http://mirrors.dotsrc.org/jpackage/6.0/generic/free/RPMS/jpackage-release-6-3.jpp6.noarch.rpm'
+  end
+
+  package 'jpackage-release' do
+    action :install
+    source "#{Chef::Config['file_cache_path']}/jpackage-release-6-3.jpp6.noarch.rpm"
+  end
+
+  execute 'change gpgcheck' do
+    command "sed -i 's/gpgcheck=1/gpgcheck=0/g' /etc/yum.repos.d/jpackage.repo"
+  end
 end
 
 include_recipe 'tomcat'

@@ -1,5 +1,7 @@
 default['java']['jdk_version'] = 7
 
+default['tomcat_part']['use_jpackage'] = false
+
 default['tomcat_part']['datasource'] = 'jdbc/postgresql'
 default['tomcat_part']['database']['type'] = 'postgresql'
 default['tomcat_part']['database']['name'] = 'application'
