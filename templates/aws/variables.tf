@@ -31,15 +31,3 @@ variable "db_instance_type" {
   description = "WebServer instance type"
   default = "t2.small"
 }
-variable "web_server_size" {
-  description = "WebServer instance size"
-  default = "1"
-}
-variable "ap_server_size" {
-  description = "APServer instance size"
-  default = "1"
-}
-variable "db_server_size" {
-  description = "DBServer instance size"
-  default = "1"
-}

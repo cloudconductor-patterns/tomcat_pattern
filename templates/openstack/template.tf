@@ -1,5 +1,4 @@
 resource "openstack_compute_floatingip_v2" "main" {
-  count = "${var.web_server_size}"
   pool = "public"
 }
 
@@ -42,7 +41,6 @@ resource "openstack_compute_secgroup_v2" "db_security_group" {
 }
 
 resource "openstack_compute_instance_v2" "web_server" {
-  count = "${var.web_server_size}"
   name = "WebServer"
   image_id = "${var.web_image}"
   flavor_name = "${var.web_instance_type}"
@@ -52,14 +50,13 @@ resource "openstack_compute_instance_v2" "web_server" {
   }
   key_pair = "${var.key_name}"
   security_groups = ["${openstack_compute_secgroup_v2.web_security_group.name}", "${var.shared_security_group}"]
-  floating_ip = "${element(openstack_compute_floatingip_v2.main.*.address, count.index)}"
+  floating_ip = "${openstack_compute_floatingip_v2.main.address}"
   network {
-    uuid = "${element(split(", ", var.subnet_ids), count.index)}"
+    uuid = "${element(split(", ", var.subnet_ids), 0)}"
   }
 }
 
 resource "openstack_compute_instance_v2" "ap_server" {
-  count = "${var.ap_server_size}"
   depends_on = ["openstack_compute_instance_v2.web_server"]
   name = "APServer"
   image_id = "${var.ap_image}"
@@ -71,12 +68,11 @@ resource "openstack_compute_instance_v2" "ap_server" {
   key_pair = "${var.key_name}"
   security_groups = ["${openstack_compute_secgroup_v2.ap_security_group.name}", "${var.shared_security_group}"]
   network {
-    uuid = "${element(split(", ", var.subnet_ids), count.index)}"
+    uuid = "${element(split(", ", var.subnet_ids), 0)}"
   }
 }
 
 resource "openstack_compute_instance_v2" "db_server" {
-  count = "${var.db_server_size}"
   depends_on = ["openstack_compute_instance_v2.web_server"]
   name = "DBServer"
   image_id = "${var.db_image}"
@@ -88,14 +84,14 @@ resource "openstack_compute_instance_v2" "db_server" {
   key_pair = "${var.key_name}"
   security_groups = ["${openstack_compute_secgroup_v2.db_security_group.name}", "${var.shared_security_group}"]
   network {
-    uuid = "${element(split(", ", var.subnet_ids), count.index)}"
+    uuid = "${element(split(", ", var.subnet_ids), 0)}"
   }
 }
 
 output "cluster_addresses" {
-  value = "${join(", ", concat(openstack_compute_instance_v2.web_server.*.network.0.fixed_ip_v4, openstack_compute_instance_v2.ap_server.*.network.0.fixed_ip_v4, openstack_compute_instance_v2.db_server.*.network.0.fixed_ip_v4))}"
+  value = "${openstack_compute_instance_v2.web_server.network.0.fixed_ip_v4}, ${openstack_compute_instance_v2.ap_server.network.0.fixed_ip_v4}, ${openstack_compute_instance_v2.db_server.network.0.fixed_ip_v4}"
 }
 
 output "frontend_addresses" {
-  value = "${join(", ", openstack_compute_floatingip_v2.main.*.address)}"
+  value = "${openstack_compute_floatingip_v2.main.address}"
 }

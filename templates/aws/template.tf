@@ -41,12 +41,11 @@ resource "aws_security_group" "db_security_group" {
 }
 
 resource "aws_instance" "web_server" {
-  count = "${var.web_server_size}"
   ami = "${var.web_image}"
   instance_type = "${var.web_instance_type}"
   key_name = "${var.key_name}"
   vpc_security_group_ids = ["${aws_security_group.web_security_group.id}", "${var.shared_security_group}"]
-  subnet_id = "${element(split(", ", var.subnet_ids), count.index)}"
+  subnet_id = "${element(split(", ", var.subnet_ids), 0)}"
   associate_public_ip_address = true
   tags {
     Name = "WebServer"
@@ -54,13 +53,12 @@ resource "aws_instance" "web_server" {
 }
 
 resource "aws_instance" "ap_server" {
-  count = "${var.ap_server_size}"
   depends_on = ["aws_instance.web_server"]
   ami = "${var.ap_image}"
   instance_type = "${var.ap_instance_type}"
   key_name = "${var.key_name}"
   vpc_security_group_ids = ["${aws_security_group.ap_security_group.id}", "${var.shared_security_group.id}"]
-  subnet_id = "${element(split(", ", var.subnet_ids), count.index)}"
+  subnet_id = "${element(split(", ", var.subnet_ids), 0)}"
   associate_public_ip_address = true
   tags {
     Name = "APServer"
@@ -68,13 +66,12 @@ resource "aws_instance" "ap_server" {
 }
 
 resource "aws_instance" "db_server" {
-  count = "${var.db_server_size}"
   depends_on = ["aws_instance.web_server"]
   ami = "${var.db_image}"
   instance_type = "${var.db_instance_type}"
   key_name = "${var.key_name}"
   vpc_security_group_ids = ["${aws_security_group.db_security_group.id}", "${var.shared_security_group.id}"]
-  subnet_id = "${element(split(", ", var.subnet_ids), count.index)}"
+  subnet_id = "${element(split(", ", var.subnet_ids), 0)}"
   associate_public_ip_address = true
   tags {
     Name = "DBServer"
@@ -82,9 +79,9 @@ resource "aws_instance" "db_server" {
 }
 
 output "cluster_addresses" {
-  value = "${join(", ", concat(aws_instance.web_server.*.private_ip, aws_instance.ap_server.*.private_ip, aws_instance.db_server.*.private_ip))}"
+  value = "${aws_instance.web_server.private_ip}, ${aws_instance.ap_server.private_ip}, ${aws_instance.db_server.private_ip}"
 }
 
 output "frontend_addresses" {
-  value = "${join(", ", concat(aws_instance.web_server.*.public_ip, aws_instance.ap_server.*.public_ip, aws_instance.db_server.*.public_ip))}"
+  value = "${aws_instance.web_server.public_ip}, ${aws_instance.ap_server.public_ip}, ${aws_instance.db_server.public_ip}"
 }
