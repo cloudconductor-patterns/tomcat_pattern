@@ -15,7 +15,7 @@ describe 'web_deploy' do
 
   it 'apache service listening port is tcp' do
     chef_run.node['apache']['listen_ports'].each do |listen_port|
-      expect(port(listen_port)).to be_listening.with('tcp')
+      expect(port(listen_port)).to be_listening # .with('tcp') # ipv4 or ipv5
     end
   end
 

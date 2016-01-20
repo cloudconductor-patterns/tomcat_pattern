@@ -1,3 +1,7 @@
+execute 'update' do
+  command 'yum update -y'
+end
+
 include_recipe 'apache2'
 package "#{node['apache']['package']}-devel"
 
@@ -17,7 +21,7 @@ bash 'install_mod_jk' do
     if [ -z "$PKG_CONFIG_PATH" ]; then
       export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/lib64/pkgconfig
     fi
-    ./configure --with-apxs=/usr/sbin/apxs
+    ./configure --with-apxs=$(which apxs)
     make
     make install
   EOS

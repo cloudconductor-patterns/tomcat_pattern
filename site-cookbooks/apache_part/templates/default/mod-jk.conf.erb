@@ -27,8 +27,12 @@ LoadModule jk_module modules/mod_jk.so
   # Add jkstatus for managing runtime data
   <Location /jkstatus/>
     JkMount status
+<% if node['apache']['version'] == "2.4" -%>
+    Require local
+<% else %>
     Order deny,allow
     Deny from all
     Allow from 127.0.0.1
+<% end %>
   </Location>
 </IfModule>
