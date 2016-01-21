@@ -14,20 +14,20 @@ variable "web_image" {
   description = "[computed] WebServer Image Id. This parameter is automatically filled by CloudConductor."
 }
 variable "ap_image" {
-  description = "[computed] APServer Image Id. This parameter is automatically filled by CloudConductor."
+  description = "[computed] ApServer Image Id. This parameter is automatically filled by CloudConductor."
 }
 variable "db_image" {
-  description = "[computed] DBServer Image Id. This parameter is automatically filled by CloudConductor."
+  description = "[computed] DbServer Image Id. This parameter is automatically filled by CloudConductor."
 }
 variable "web_instance_type" {
   description = "WebServer instance type"
   default = "t2.small"
 }
 variable "ap_instance_type" {
-  description = "WebServer instance type"
+  description = "ApServer instance type"
   default = "t2.small"
 }
 variable "db_instance_type" {
-  description = "WebServer instance type"
+  description = "DbServer instance type"
   default = "t2.small"
 }

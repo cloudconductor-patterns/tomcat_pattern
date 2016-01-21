@@ -20,7 +20,8 @@ resource "openstack_compute_secgroup_v2" "ap_security_group" {
     from_port = 8009
     to_port = 8009
     ip_protocol = "tcp"
-    from_group_id = "${openstack_compute_secgroup_v2.web_security_group.id}"  }
+    from_group_id = "${openstack_compute_secgroup_v2.web_security_group.id}"
+  }
   rule {
     from_port = 12345
     to_port = 12346

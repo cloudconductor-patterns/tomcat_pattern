@@ -1,5 +1,5 @@
 resource "aws_eip" "web_server_eip" {
-  vpc = "true"
+  vpc = true
   instance = "${aws_instance.web_server.id}"
 }
 
