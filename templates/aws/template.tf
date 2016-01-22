@@ -88,5 +88,5 @@ output "cluster_addresses" {
 }
 
 output "frontend_addresses" {
-  value = "${aws_instance.web_server.public_ip}, ${aws_instance.ap_server.public_ip}, ${aws_instance.db_server.public_ip}"
+  value = "${aws_eip.web_server_eip.public_ip}, ${aws_instance.ap_server.public_ip}, ${aws_instance.db_server.public_ip}"
 }
