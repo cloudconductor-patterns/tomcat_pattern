@@ -98,7 +98,7 @@ tasks:
     description: Restart tomcat to disconnect to database
     operations:
       - service:
-          name: tomcat7
+          name: tomcat
           action: restart
 
   restore_database:
