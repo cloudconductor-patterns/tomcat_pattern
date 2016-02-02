@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe service('tomcat7') do
+describe service('tomcat') do
   it { should be_running }
 end
 
