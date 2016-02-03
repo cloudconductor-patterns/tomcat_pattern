@@ -8,7 +8,7 @@ end
 
 # Cehck listen port
 describe port(80) do
-  it { should be_listening.with('tcp') }
+  it { should be_listening } # ipv4 or ipv6
 end
 
 # Check connect ap servers

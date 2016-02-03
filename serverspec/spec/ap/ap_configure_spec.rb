@@ -5,5 +5,5 @@ describe service('tomcat') do
 end
 
 describe port(8009) do
-  it { should be_listening.with('tcp') }
+  it { should be_listening } # ipv4 or ipv6
 end
