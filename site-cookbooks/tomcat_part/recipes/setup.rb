@@ -26,6 +26,8 @@ if node['tomcat_part']['use_jpackage']
   end
 end
 
+package 'java-1.5.0-gcj' if node[:platform_version].to_i <= 6
+
 include_recipe 'java'
 include_recipe 'tomcat'
 
