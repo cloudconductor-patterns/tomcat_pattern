@@ -26,6 +26,7 @@ if node['tomcat_part']['use_jpackage']
   end
 end
 
+include_recipe 'java'
 include_recipe 'tomcat'
 
 # Install JDBC Driver
