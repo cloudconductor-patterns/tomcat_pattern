@@ -350,6 +350,10 @@
       "Value" : { "Ref" : "FrontendEIP" },
       "Description" : "Frontend DNS name or IP address to access Consul api port from CloudConductor server. This output is required."
     },
+    "ConsulAddresses" : {
+      "Value" : { "Ref" : "FrontendEIP" },
+      "Description" : "Address to request from CloudConductor server to consul cluster. This output is required."
+    },
     "VpcId" : {
       "Value" : { "Ref" : "VPC" },
       "Description" : "Reference of VPC to create subnet, security group on same VPC in optional pattern. This output is required."

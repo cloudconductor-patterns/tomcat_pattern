@@ -87,6 +87,10 @@ output "cluster_addresses" {
   value = "${aws_instance.web_server.private_ip}, ${aws_instance.ap_server.private_ip}, ${aws_instance.db_server.private_ip}"
 }
 
-output "frontend_addresses" {
+output "consul_addresses" {
   value = "${aws_eip.web_server_eip.public_ip}, ${aws_instance.ap_server.public_ip}, ${aws_instance.db_server.public_ip}"
+}
+
+output "frontend_addresses" {
+  value = "${aws_eip.web_server_eip.public_ip}"
 }

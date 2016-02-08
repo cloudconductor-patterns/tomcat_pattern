@@ -93,6 +93,10 @@ output "cluster_addresses" {
   value = "${openstack_compute_instance_v2.web_server.network.0.fixed_ip_v4}, ${openstack_compute_instance_v2.ap_server.network.0.fixed_ip_v4}, ${openstack_compute_instance_v2.db_server.network.0.fixed_ip_v4}"
 }
 
+output "consul_addresses" {
+  value = "${openstack_compute_floatingip_v2.main.address}"
+}
+
 output "frontend_addresses" {
   value = "${openstack_compute_floatingip_v2.main.address}"
 }
