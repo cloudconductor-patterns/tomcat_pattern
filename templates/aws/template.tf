@@ -91,6 +91,6 @@ output "consul_addresses" {
   value = "${aws_eip.web_server_eip.public_ip}, ${aws_instance.ap_server.public_ip}, ${aws_instance.db_server.public_ip}"
 }
 
-output "frontend_addresses" {
+output "frontend_address" {
   value = "${aws_eip.web_server_eip.public_ip}"
 }
