@@ -8,7 +8,7 @@ case node['platform_family']
 
 when 'rhel', 'fedora'
   suffix = node['tomcat']['base_version'].to_i < 7 ? node['tomcat']['base_version'] : ''
-  suffix = node['tomcat']['base_version'] if node['tomcat_part']['use_jpackage']
+#  suffix = node['tomcat']['base_version'] if node['tomcat_part']['use_jpackage']
 
   default['tomcat']['base_instance'] = "tomcat#{suffix}"
   default['tomcat']['user'] = 'tomcat'
