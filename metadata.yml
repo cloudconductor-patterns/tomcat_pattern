@@ -10,6 +10,11 @@ type:      "platform"
 dependencies: ["common_network"]
 conflicts: []
 
+roles:
+  - web
+  - ap
+  - db
+
 providers:
     aws:
       - cloud_formation
