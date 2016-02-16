@@ -84,13 +84,7 @@ RUN echo 'git clone https://github.com/cloudconductor/cloud_conductor_init.git /
     echo 'cd /opt/cloudconductor' >> ./bootstrap.sh
 
 # RUN echo 'git checkout develop' >> ./bootstrap.sh
-RUN echo 'git checkout feature/support-centos-7' >> ./bootstrap.sh
-
-RUN echo 'git pull' >> ./bootstrap.sh && \
-    echo 'export PATTERN_NAME="<%= @cc_pattern %>"' >> ./bootstrap.sh && \
-    echo 'bash -x ./bin/setup.sh' >> ./bootstrap.sh
-
-RUN bash -x ./bootstrap.sh
+RUN echo 'git checkout feature/support-centos7' >> ./bootstrap.sh
 
 # follow prepare.sh from pattern
 RUN echo 'git clone https://github.com/cloudconductor-patterns/<%= @cc_pattern %>.git /opt/cloudconductor/patterns/<%= @cc_pattern %>' > ./bootstrap.sh && \
@@ -98,6 +92,10 @@ RUN echo 'git clone https://github.com/cloudconductor-patterns/<%= @cc_pattern %
 
 #RUN echo 'git checkout develop' >> ./bootstrap.sh
 RUN echo 'git checkout feature/support-centos7' >> ./bootstrap.sh
+
+RUN echo 'git pull' >> ./bootstrap.sh && \
+    echo 'export PATTERN_NAME="<%= @cc_pattern %>"' >> ./bootstrap.sh && \
+    echo 'bash -x ./bin/setup.sh' >> ./bootstrap.sh
 
 RUN echo 'git pull' >> ./bootstrap.sh && \
     echo 'bash -x prepare.sh' >> ./bootstrap.sh
