@@ -1,7 +1,3 @@
-execute 'update' do
-  command 'yum update -y'
-end
-
 include_recipe 'apache2'
 package "#{node['apache']['package']}-devel"
 

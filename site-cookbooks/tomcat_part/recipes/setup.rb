@@ -1,7 +1,3 @@
-execute 'update' do
-  command 'yum update -y'
-end
-
 if node['tomcat_part']['use_jpackage']
   package 'yum-plugin-priorities'
 
