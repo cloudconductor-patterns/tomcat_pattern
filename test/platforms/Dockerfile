@@ -87,18 +87,20 @@ RUN echo 'git clone https://github.com/cloudconductor/cloud_conductor_init.git /
 RUN echo 'git checkout feature/support-centos7' >> ./bootstrap.sh
 
 # follow prepare.sh from pattern
-RUN echo 'git clone https://github.com/cloudconductor-patterns/<%= @cc_pattern %>.git /opt/cloudconductor/patterns/<%= @cc_pattern %>' > ./bootstrap.sh && \
+RUN echo 'git clone https://github.com/cloudconductor-patterns/<%= @cc_pattern %>.git /opt/cloudconductor/patterns/<%= @cc_pattern %>' >> ./bootstrap.sh && \
     echo 'cd /opt/cloudconductor/patterns/<%= @cc_pattern %>' >> ./bootstrap.sh
 
 #RUN echo 'git checkout develop' >> ./bootstrap.sh
 RUN echo 'git checkout feature/support-centos7' >> ./bootstrap.sh
 
-RUN echo 'git pull' >> ./bootstrap.sh && \
+RUN echo 'cd /opt/cloudconductor' >> ./bootstrap.sh && \
+    echo 'git pull' >> ./bootstrap.sh && \
     echo 'export PATTERN_NAME="<%= @cc_pattern %>"' >> ./bootstrap.sh && \
     echo 'bash -x ./bin/setup.sh' >> ./bootstrap.sh
 
-RUN echo 'git pull' >> ./bootstrap.sh && \
-    echo 'bash -x prepare.sh' >> ./bootstrap.sh
+RUN echo 'cd /opt/cloudconductor/patterns/<%= @cc_pattern %>' >> ./bootstrap.sh && \
+    echo 'git pull' >> ./bootstrap.sh && \
+    echo 'bash prepare.sh' >> ./bootstrap.sh
 
 RUN bash -x ./bootstrap.sh
 
@@ -111,4 +113,21 @@ RUN echo "export http_proxy=<%= @http_proxy %>" >> /etc/profile.d/proxy.sh
 <% if @https_proxy %>
 RUN echo "export https_proxy=<%= @http_proxy %>" >> /etc/profile.d/proxy.sh
 <% end %>
+<% end %>
+
+<% if @image == 'centos:centos7' and @cc_role != 'db' %>
+RUN yum update -y
+
+RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+rm -f /lib/systemd/system/multi-user.target.wants/*;\
+rm -f /etc/systemd/system/*.wants/*;\
+rm -f /lib/systemd/system/local-fs.target.wants/*; \
+rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
+rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
+rm -f /lib/systemd/system/basic.target.wants/*;\
+rm -f /lib/systemd/system/anaconda.target.wants/*;
+
+RUN /bin/systemctl set-default multi-user.target
+RUN /bin/systemctl enable sshd
+RUN sed -ri 's/^UsePAM yes/UsePAM no/' /etc/ssh/sshd_config
 <% end %>
