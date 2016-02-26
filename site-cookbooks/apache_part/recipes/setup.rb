@@ -1,6 +1,8 @@
 include_recipe 'apache2'
 package "#{node['apache']['package']}-devel"
 
+package 'tar'
+
 mod_jk_version = node['apache_part']['mod_jk']['version']
 file_path = File.join(Chef::Config[:file_cache_path], "tomcat-connectors-#{mod_jk_version}-src.tar.gz")
 

@@ -97,8 +97,6 @@ setup_python_env() {
   fi
 }
 
-yum install -y tar
-
 install_chef
 install_berkshelf
 install_serverspec
