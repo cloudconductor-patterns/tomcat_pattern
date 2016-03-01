@@ -1,3 +1,16 @@
+bash 'create_pid_file' do
+  pid_file = "/var/run/#{node['postgresql']['server']['service_name']}.pid"
+  postmaster_file = "#{node['postgresql']['dir']}/postmaster.pid"
+  code <<-EOS
+    if [ ! -f #{postmaster_file} ]; then
+      exit 1
+    fi
+    head -n 1 #{postmaster_file} > #{pid_file}
+  EOS
+  not_if { ::File.exist?(pid_file) }
+  retries 5
+end
+
 postgresql_connection_info = {
   host: '127.0.0.1',
   port: node['postgresql']['config']['port'],
