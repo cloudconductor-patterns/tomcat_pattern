@@ -1,6 +1,6 @@
 default['java']['jdk_version'] = 7
 
-if node['platform_family'] == 'rhel' && node[:platform_version].to_i <= 6
+if node['platform_family'] == 'rhel' && node['platform_version'].to_i <= 6
   default['tomcat_part']['use_jpackage'] = true
 else
   default['tomcat_part']['use_jpackage'] = false
