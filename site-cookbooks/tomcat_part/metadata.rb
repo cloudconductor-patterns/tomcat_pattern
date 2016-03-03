@@ -9,4 +9,5 @@ supports 'centos', '= 6.5'
 
 depends 'cloudconductor'
 depends 'yum'
-depends 'tomcat', "< 0.17"
+depends 'java'
+depends 'tomcat', ">= 0.17"

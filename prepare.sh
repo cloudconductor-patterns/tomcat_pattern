@@ -92,6 +92,7 @@ setup_python_env() {
 
   run which pip
   if [ $status -ne 0 ] ; then
+
     run bash -c "curl -kL https://bootstrap.pypa.io/get-pip.py | python"
     if [ $status -ne 0 ] ; then
       echo "$output" >&2
@@ -99,10 +100,14 @@ setup_python_env() {
     fi
   fi
 
-  run pip install -r ${PACKAGE_LIST}
+  run pip install PyYAML
   if [ $status -ne 0 ] ; then
     echo "$output" >&2
-    deactivate
+    return 1
+  fi
+  run pip install python-consul
+  if [ $status -ne 0 ] ; then
+    echo "$output" >&2
     return 1
   fi
 }

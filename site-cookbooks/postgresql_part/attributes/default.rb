@@ -4,6 +4,8 @@ default['postgresql']['client']['packages'] = ["postgresql#{node['postgresql']['
 default['postgresql']['server']['packages'] = ["postgresql#{node['postgresql']['version'].split('.').join}-server"]
 default['postgresql']['contrib']['packages'] = ["postgresql#{node['postgresql']['version'].split('.').join}-contrib"]
 default['postgresql']['dir'] = "/var/lib/pgsql/#{node['postgresql']['version']}/data"
+
+default['postgresql']['setup_script'] = "postgresql#{node['postgresql']['version'].split('.').join}-setup"
 default['postgresql']['server']['service_name'] = "postgresql-#{node['postgresql']['version']}"
 default['postgresql']['password']['postgres'] = 'todo_replace_random_password'
 default['postgresql']['config']['listen_addresses'] = '*'

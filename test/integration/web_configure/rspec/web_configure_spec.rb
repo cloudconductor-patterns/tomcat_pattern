@@ -15,7 +15,7 @@ describe 'web_configure' do
 
   it 'is apache ports is listning' do
     chef_run.node['apache']['listen_ports'].each do |listen_port|
-      expect(port(listen_port)).to be_listening.with('tcp')
+      expect(port(listen_port)).to be_listening # .with('tcp') # ipv4 or ipv6
     end
   end
 
