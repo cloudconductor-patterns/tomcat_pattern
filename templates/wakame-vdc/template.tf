@@ -18,8 +18,8 @@ resource "wakamevdc_security_group" "db_security_group" {
 
 resource "wakamevdc_instance" "web_server" {
   display_name = "WebServer"
-  cpu_cores = 1
-  memory_size = 512
+  cpu_cores = "${var.web_cpu_cores}"
+  memory_size = "${var.web_memory_size}"
   image_id = "${var.web_image}"
   hypervisor = "kvm"
   ssh_key_id = "${var.key_name}"
@@ -43,8 +43,8 @@ resource "wakamevdc_instance" "web_server" {
 resource "wakamevdc_instance" "ap_server" {
   depends_on = ["wakamevdc_instance.web_server"]
   display_name = "APServer"
-  cpu_cores = 1
-  memory_size = 512
+  cpu_cores = "${var.ap_cpu_cores}"
+  memory_size = "${var.ap_memory_size}"
   image_id = "${var.ap_image}"
   hypervisor = "kvm"
   ssh_key_id = "${var.key_name}"
@@ -67,8 +67,8 @@ resource "wakamevdc_instance" "ap_server" {
 resource "wakamevdc_instance" "db_server" {
   depends_on = ["wakamevdc_instance.web_server"]
   display_name = "DBServer"
-  cpu_cores = 1
-  memory_size = 512
+  cpu_cores = "${var.db_cpu_cores}"
+  memory_size = "${var.db_memory_size}"
   image_id = "${var.db_image}"
   hypervisor = "kvm"
   ssh_key_id = "${var.key_name}"
