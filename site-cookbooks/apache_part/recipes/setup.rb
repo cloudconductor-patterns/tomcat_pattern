@@ -1,6 +1,8 @@
 include_recipe 'apache2'
 package "#{node['apache']['package']}-devel"
 
+package 'tar'
+
 mod_jk_version = node['apache_part']['mod_jk']['version']
 file_path = File.join(Chef::Config[:file_cache_path], "tomcat-connectors-#{mod_jk_version}-src.tar.gz")
 
@@ -17,7 +19,7 @@ bash 'install_mod_jk' do
     if [ -z "$PKG_CONFIG_PATH" ]; then
       export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/lib64/pkgconfig
     fi
-    ./configure --with-apxs=/usr/sbin/apxs
+    ./configure --with-apxs=$(which apxs)
     make
     make install
   EOS

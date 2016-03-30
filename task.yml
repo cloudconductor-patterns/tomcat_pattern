@@ -1,6 +1,6 @@
 environments:
   HOME: /root
-  PATH: $PATH:/opt/chefdk/embedded/bin:/opt/chef/embedded/bin:/usr/bin
+  PATH: $PATH:/usr/local/bin:/usr/bin
   ROLE: '{{config.role}}'
   CONSUL_SECRET_KEY: '{{config.token}}'
 
@@ -76,7 +76,9 @@ tasks:
     description: Execute serverspec
     operations:
       - execute:
-          script: python lib/serverspec.py {{role}}
+          script: |
+            gem install activesupport
+            python lib/serverspec.py {{role}}
 
   deploy:
     description: Execute deploy chef
@@ -98,7 +100,7 @@ tasks:
     description: Restart tomcat to disconnect to database
     operations:
       - service:
-          name: tomcat7
+          name: tomcat
           action: restart
 
   restore_database:

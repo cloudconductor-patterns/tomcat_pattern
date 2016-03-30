@@ -3,13 +3,30 @@ maintainer:       "TIS Inc."
 maintainer_email: "ccndctr@gmail.com"
 license:          "Apache v2.0"
 description:      "CloudConductor platform pattern for Java application"
-version:          "1.1.0"
+version:          "2.0.0"
 url:              "https://github.com/cloudconductor-patterns/tomcat_pattern"
 
 type:      "platform"
-depends:   []
+dependencies: ["common_network"]
 conflicts: []
 
+roles:
+  - web
+  - ap
+  - db
+
+providers:
+    aws:
+      - cloud_formation
+      - terraform
+    openstack:
+      - cloud_formation
+      - terraform
+    wakame-vdc:
+      - terraform
+
 supports:
-  - os: "centos"
-    version: "= 6.5"
+  - platform: "centos"
+    platform_version: "6.7"
+  - platform: "centos"
+    platform_version: "7.2"

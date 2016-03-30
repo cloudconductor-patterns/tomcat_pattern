@@ -8,7 +8,7 @@ end
 
 # Cehck listen port
 describe port(80) do
-  it { should be_listening.with('tcp') }
+  it { should be_listening } # ipv4 or ipv6
 end
 
 # Check connect ap servers
@@ -18,8 +18,8 @@ describe 'connect ap_servers' do
   end
 
   ap_servers.each do |server|
-    describe command("hping3 -S #{server[:private_ip]} -p 8009 -c 5") do
-      its(:stdout) { should match(/sport=8009 flags=SA/) }
+    describe host(server[:private_ip]) do
+      it { should be_reachable.with(port: 8009) }
     end
   end
 end
