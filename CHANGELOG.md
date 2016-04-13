@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+## version 2.0.1 (2016/04/14)
+
+  - Download tomcat-connector from archive subdomain on apache.org
+
 ## version 2.0.0 (2016/03/30)
 
   - Support CloudConductor v2.0.

@@ -7,7 +7,7 @@ mod_jk_version = node['apache_part']['mod_jk']['version']
 file_path = File.join(Chef::Config[:file_cache_path], "tomcat-connectors-#{mod_jk_version}-src.tar.gz")
 
 remote_file 'tomcat_connectors' do
-  source "http://www.apache.org/dist/tomcat/tomcat-connectors/jk/tomcat-connectors-#{mod_jk_version}-src.tar.gz"
+  source "http://archive.apache.org/dist/tomcat/tomcat-connectors/jk/tomcat-connectors-#{mod_jk_version}-src.tar.gz"
   path file_path
   not_if { File.exist?("#{node['apache']['libexec_dir']}/mod_jk.so") }
 end
